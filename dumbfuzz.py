@@ -8,8 +8,9 @@ notes:
 '''
 
 import gdb
-import psutil
 import optparse
+import psutil
+import time
 import os
 import sys
 
@@ -36,8 +37,11 @@ close program if nothing happens
 """
 
 def die(msg):
-    sys.stderr.write(msg + "\n")
+    sys.stderr.write("[ERROR] " + msg + "\n")
     sys.exit(-1)
+
+def debug_msg(msg):
+    gdb.write('[DEBUG] ' + msg + '\n')
 
 #receive full path of testcase, and dst dir
 #write target files
@@ -47,11 +51,11 @@ def fuzz_testcase(testcase, fuzzDst):
     global debugFlag
     if not os.path.exists(fuzzDst):
         if debugFlag:
-            gdb.write("creating dir %s\n" % (fuzzDst))
+            debug_msg("creating dir %s\n" % (fuzzDst))
         os.mkdir(fuzzDst)
     if debugFlag:
         fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, testcase)
-        gdb.write(fuzzCmd)
+        debug_msg(fuzzCmd)
     else:
         fuzzCmd = "%s -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, testcase)
     ret = os.system(fuzzCmd)
@@ -64,10 +68,26 @@ def empty_fuzzdir(fuzzDst):
 
 #we should do this with gdb, idiot
 def get_process_pid(pname):
-    process = filter(lambda p: p.name == pname, psutil.process_iter())
+    process = list(filter(lambda p: p.name == pname, psutil.process_iter()))
     #there should be one and only one, check this
-    if process = None:
+    if process == None:
         die("no process found, this is bad")
+    if len(process) > 1:
+        die("too many process, dying")
+    return process[0].pid
+
+#wait until process is not busy ("define busy?")
+def wait_for_proc(pid):
+    global debugFlag
+    interval=1      #in second
+    threshold=20    #in percent
+    p = psutil.Process(pid)
+    while True:
+        cpu=p.get_cpu_percent()
+        if debugFlag:
+            debug_msg("process CPU usage: %d" % cpu)
+        time.sleep(interval)
+        
 
 def parse_args():
     parser = optparse.OptionParser("%prog [-d]")
@@ -90,11 +110,13 @@ def main():
     f=os.listdir(testcasesPath)[0]
     fpfile="%s/%s" % (testcasesPath, f)
     #fuzz_testcase(fpfile, fuzzDst)
-    for each file in os.listdir(fuzzDst): 
+    for file in os.listdir(fuzzDst): 
         gdb.execute("file %s" % exePath)
         gdb.execute("r %s %s" % (gdbArgs,fpfile))
     
         pid=get_process_pid(os.path.basename(exePath) )
+        wait_for_proc(pid)
+        gdb.execute('kill')
         
         
     #empty_fuzzdir(fuzzDst)
