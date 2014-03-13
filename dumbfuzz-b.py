@@ -1,4 +1,4 @@
-#!/usr/bin/gdb -x 
+#!/usr/bin/python3
 
 '''
 gdb python script
@@ -7,7 +7,6 @@ notes:
     - you should avoid running manually the same target program while this is running, get_process_pid will not like it
 '''
 
-import gdb
 import optparse
 import threading
 import psutil
@@ -42,17 +41,18 @@ def die(msg):
     sys.exit(-1)
 
 def debug_msg(msg):
-    gdb.write('[DEBUG] ' + msg + '\n')
+    global debugFlag
+    if debugFlag:
+        sys.stdout.write('[DEBUG] ' + msg + '\n')
+    return
 
 #receive full path of testcase, and dst dir
 #write target files
 def fuzz_testcase(testcase, fuzzDst):
     global fuzzerPath
     global fuzzIter
-    global debugFlag
     if not os.path.exists(fuzzDst):
-        if debugFlag:
-            debug_msg("creating dir %s\n" % (fuzzDst))
+        debug_msg("creating dir %s\n" % (fuzzDst))
         os.mkdir(fuzzDst)
     if debugFlag:
         fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, testcase)
@@ -69,40 +69,49 @@ def empty_fuzzdir(fuzzDst):
 
 #we should do this with gdb, idiot
 def get_process_pid(pname):
-    global debugFlag
+
     process = list(filter(lambda p: p.name == pname, psutil.process_iter()))
     #there should be one and only one, check this
     if len(process) == 0:
-        if debugFlag:
-            debug_msg("no process found, this is bad")
+        debug_msg("no process found, this is bad")
         return None
     if len(process) > 1:
         die("too many process, dying")
     return process[0].pid
+
+def getSigma2(l, mean):
+    s2=[]
+    for i in l:
+        s2 += i*i
+    return (sum(s2)/len(s2))-(mean*mean)
 
 #wait until process is not busy ("define busy?")
 #XXX blocking?
 def wait_for_proc(pid):
     global debugFlag
     interval=1      #in second
+    nslices=5
     threshold=20    #in percent
     p = psutil.Process(pid)
     while True:
-        cpu=p.get_cpu_percent()
-        if debugFlag:
-            debug_msg("process CPU usage: %d" % cpu)
-        time.sleep(interval)
+        cpu=[]
+        for i in range(0,nslices):
+            cpu += p.get_cpu_percent()
+            time.sleep(interval/slices)
+        mean=sum(cpu)/len(cpu)
+        sigma2=get_sigma2(cpu, mean)
+        debug_msg("avg process CPU usage: %d" % mean)
+        debug_msg("variance is: %d" % sigma2)
 
 #run in a separate thread, wait for process to load, kill it when it stop loading
 #XXX blocking?
 def proc_checker():
     global exePath
-    global debugFlag
     
     while True:        
         pid=get_process_pid(os.path.basename(exePath) )
         if pid:
-            return pid
+            break
         time.sleep(0.2)
     wait_for_proc(pid)
     
@@ -119,8 +128,6 @@ def main():
     global testcasesPath
     global fuzzDst
     
-    global debugFlag
-    
     opts, args = parse_args()
     
     debugFlag = opts.debug
@@ -128,12 +135,12 @@ def main():
     f=os.listdir(testcasesPath)[0]
     fpfile="%s/%s" % (testcasesPath, f)
     #fuzz_testcase(fpfile, fuzzDst)
-    for file in os.listdir(fuzzDst):
-        gdb.execute("file %s" % exePath)
-        debug_msg("start checker thread")
-        threading.Thread(target=proc_checker).start()
-        debug_msg("run target")
-        gdb.execute("r %s %s" % (gdbArgs,fpfile))
+    #for file in os.listdir(fuzzDst):
+        #gdb.execute("file %s" % exePath)
+    debug_msg("start checker thread")
+    threading.Thread(target=proc_checker).start()
+    debug_msg("run target")
+    os.system("./launcher.py %s" % exePath)
           
     #empty_fuzzdir(fuzzDst)
 
