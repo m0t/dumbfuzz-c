@@ -1,5 +1,5 @@
 #!/usr/bin/gdb -x 
-gdbArgs='--impress'
-fpfile='/mnt/shared/ppt/2003gr9.ppt'
+gdbArgs='--impress --norestore'
+fpfile='fuzzed/fuzzed-100.ppt'
 #gdb.execute("file %s" % exePath)
 gdb.execute("r %s %s" % (gdbArgs,fpfile))

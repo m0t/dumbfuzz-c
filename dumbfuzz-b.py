@@ -24,7 +24,9 @@ fuzzerPath="./radamsa-bin"
 fuzzIter=200
 fuzzDst="fuzzed"
 restoreFlag = False
-debugFlag = False
+debugFlag = True
+processTimeout=20 #seconds
+
 
 #############
 
@@ -73,7 +75,7 @@ def get_process_pid(pname):
     process = list(filter(lambda p: p.name == pname, psutil.process_iter()))
     #there should be one and only one, check this
     if len(process) == 0:
-        debug_msg("no process found, this is bad")
+        debug_msg("no process found")
         return None
     if len(process) > 1:
         die("too many process, dying")
@@ -82,26 +84,30 @@ def get_process_pid(pname):
 def getSigma2(l, mean):
     s2=[]
     for i in l:
-        s2 += i*i
+        s2.append(i*i)
     return (sum(s2)/len(s2))-(mean*mean)
 
 #wait until process is not busy ("define busy?")
 #XXX blocking?
-def wait_for_proc(pid):
+#things: set timeout, some files can really take time, save long running files in case, 
+def wait_for_proc(pid, timeout):
     global debugFlag
-    interval=1      #in second
+    interval=1.0      #in second
     nslices=5
     threshold=20    #in percent
     p = psutil.Process(pid)
-    while True:
+    while not timeout.is_set():
         cpu=[]
         for i in range(0,nslices):
-            cpu += p.get_cpu_percent()
-            time.sleep(interval/slices)
+            cpu.append(p.get_cpu_percent())
+            time.sleep(interval/nslices)
         mean=sum(cpu)/len(cpu)
-        sigma2=get_sigma2(cpu, mean)
+        sigma2=getSigma2(cpu, mean)
         debug_msg("avg process CPU usage: %d" % mean)
         debug_msg("variance is: %d" % sigma2)
+    
+    debug_msg("timeout reached, killing the process and dying")
+    p.kill()
 
 #run in a separate thread, wait for process to load, kill it when it stop loading
 #XXX blocking?
@@ -111,14 +117,25 @@ def proc_checker():
     while True:        
         pid=get_process_pid(os.path.basename(exePath) )
         if pid:
+            debug_msg("pid found: %d ; starting timer thread" % pid)
+            timeout=threading.Event()
+            threading.Thread(target=timer_thread, args=[timeout]).start()
             break
         time.sleep(0.2)
-    wait_for_proc(pid)
+    wait_for_proc(pid,timeout)
     
 
+def timer_thread(event):
+    global processTimeout
+    time.sleep(processTimeout)
+    event.set()
+
 def parse_args():
-    parser = optparse.OptionParser("%prog [-d]")
-    parser.add_option("-d", "--debug", help="get debug output", action="store_true", dest="debug", default=True)  
+    parser = optparse.OptionParser("%prog [-d] [-s] [-S session]")
+    parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
+    parser.add_option("-s", "--export", help="save filelist.txt ", action="store_true", dest="saveList", default=False)
+    parser.add_option("-S", "--session", help="start from session file", dest="sessionFile", default=None)
+    parser.add_option("-S", "--write", help="save session.restore", action="store_true", dest="saveSession", default=None)
     
     return parser.parse_args()
 
@@ -127,6 +144,7 @@ def main():
     global gdbArgs
     global testcasesPath
     global fuzzDst
+    global debugFlag
     
     opts, args = parse_args()
     
@@ -137,10 +155,10 @@ def main():
     #fuzz_testcase(fpfile, fuzzDst)
     #for file in os.listdir(fuzzDst):
         #gdb.execute("file %s" % exePath)
-    debug_msg("start checker thread")
+    debug_msg("starting checker thread")
     threading.Thread(target=proc_checker).start()
     debug_msg("run target")
-    os.system("./launcher.py %s" % exePath)
+    os.system("./launcher.py --batch %s >/dev/null" % exePath)
           
     #empty_fuzzdir(fuzzDst)
 
