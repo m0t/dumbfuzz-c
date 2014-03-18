@@ -17,7 +17,7 @@ import sys
 ####GLOBAL###
 exePath="/usr/lib/libreoffice/program/soffice.bin"
 gdbArgs='--impress'
-testcasesPath="/mnt/shared/ppt"
+#testcasesPath="/mnt/shared/ppt"
 crashesPath=""
 logsPath=""
 fuzzerPath="./radamsa-bin"
@@ -26,6 +26,7 @@ fuzzDst="fuzzed"
 restoreFlag = False
 debugFlag = True
 processTimeout=20 #seconds
+listfile='filelist.txt'
 
 
 #############
@@ -131,11 +132,12 @@ def timer_thread(event):
     event.set()
 
 def parse_args():
-    parser = optparse.OptionParser("%prog [-d] [-s] [-S session]")
+    parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
     parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
     parser.add_option("-s", "--export", help="save filelist.txt ", action="store_true", dest="saveList", default=False)
-    parser.add_option("-S", "--session", help="start from session file", dest="sessionFile", default=None)
-    parser.add_option("-S", "--write", help="save session.restore", action="store_true", dest="saveSession", default=None)
+    parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
+    parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
+    parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
     
     return parser.parse_args()
 
@@ -145,22 +147,61 @@ def main():
     global testcasesPath
     global fuzzDst
     global debugFlag
+    global listfile
     
     opts, args = parse_args()
     
     debugFlag = opts.debug
     
-    f=os.listdir(testcasesPath)[0]
-    fpfile="%s/%s" % (testcasesPath, f)
-    #fuzz_testcase(fpfile, fuzzDst)
-    #for file in os.listdir(fuzzDst):
-        #gdb.execute("file %s" % exePath)
-    debug_msg("starting checker thread")
-    threading.Thread(target=proc_checker).start()
-    debug_msg("run target")
-    os.system("./launcher.py --batch %s >/dev/null" % exePath)
+    if opts.filelist and opts.fuzzdir:
+        die("options -L and -D are mutually exclusive")
+    if not opts.filelist and not opts.fuzzdir:
+        die("dickhead")
+    if opts.fuzzdir:
+        testcasesPath=opts.fuzzdir
+        filelist=os.listdir(testcasesPath)
+    if opts.filelist:
+        if opts.saveList:
+            debug_msg("already loading from filelist, unsetting writing")
+            opts.saveList = False
+        try:
+            lf=open(opts.saveList)
+            filelist=lf.read().split('\n')
+        except:
+            die('Impossible to load file list, check file and syntax')
+    
+    if not filelist:
+        die("no input files were specified")
+    
+    if opts.saveList:
+        debug_msg("saving list of files to %s" % listfile)
+        lf = open(listfile)
+        lf.write("\n".join([str(i) for i in filelist]))
+        lf.close()
+    
+    #XXX: why is this here?
+    try:
+        #XXX skipto
+        f=filelist[0]
+        fpfile="%s/%s" % (testcasesPath, f)
+        #XXX debug_msg('fuzzing file #%d' % 0)
+        debug_msg('bypassing all filelist conf while testing :)')
+        #fuzz_testcase(fpfile, fuzzDst)
+        #for file in os.listdir(fuzzDst):
+            #gdb.execute("file %s" % exePath)
+        debug_msg("starting checker thread")
+        checker_thread=threading.Thread(target=proc_checker)
+        checker_thread.start()
+        debug_msg("run target")
+        #XXX NO! Popen, take pid, kill it when needed
+        #os.system("./launcher.py --batch %s >/dev/null" % exePath)
+        os.system("./launcher.py --batch %s" % "../gdb/a.out")
           
-    #empty_fuzzdir(fuzzDst)
+        #empty_fuzzdir(fuzzDst)
+    except KeyboardInterrupt:
+        #close threads?
+        debug_msg("Ctrl-c detected, exiting")
+        sys.exit(0)
 
 
 main()
