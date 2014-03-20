@@ -7,6 +7,7 @@ notes:
     - you should avoid running manually the same target program while this is running, get_process_pid will not like it
 '''
 
+import subprocess
 import optparse
 import threading
 import psutil
@@ -179,7 +180,7 @@ def main():
         lf.write("\n".join([str(i) for i in filelist]))
         lf.close()
     
-    #XXX: why is this here?
+    #XXX: why is this try here?
     try:
         #XXX skipto
         f=filelist[0]
@@ -195,12 +196,14 @@ def main():
         debug_msg("run target")
         #XXX NO! Popen, take pid, kill it when needed
         #os.system("./launcher.py --batch %s >/dev/null" % exePath)
-        os.system("./launcher.py --batch %s" % "../gdb/a.out")
+        #os.system("./launcher.py --batch %s" % "../gdb/a.out")
+        gdb_proc = subprocess.Popen("./launcher.py --batch %s &" % "../gdb/a.out", shell="/usr/bin/python")
           
         #empty_fuzzdir(fuzzDst)
     except KeyboardInterrupt:
         #close threads?
         debug_msg("Ctrl-c detected, exiting")
+        gdb_proc.kill()
         sys.exit(0)
 
 
