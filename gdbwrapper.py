@@ -110,7 +110,7 @@ class GDBWrapper(object):
         out = self.execute_redirect('info proc')
         if out is None: # non-Linux or cannot access /proc, fallback
             out = self.execute_redirect('info program')
-        out = out.splitlines()[0]
+        out = out.splitlines()[0].decode('ascii')
         if "process" in out or "Thread" in out:
             pid = out.split()[-1].strip(".)")
             return int(pid)

@@ -71,6 +71,7 @@ def fuzz_testcase(testcase, fuzzDst):
 def empty_fuzzdir(fuzzDst):
     os.system("rm -rf %s/*" % fuzzDst)
 
+'''
 #we should do this with gdb, idiot
 def get_process_pid(pname):
 
@@ -131,6 +132,7 @@ def timer_thread(event):
     global processTimeout
     time.sleep(processTimeout)
     event.set()
+'''
 
 def parse_args():
     parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
@@ -190,15 +192,12 @@ def main():
         #fuzz_testcase(fpfile, fuzzDst)
         #for file in os.listdir(fuzzDst):
             #gdb.execute("file %s" % exePath)
-        debug_msg("starting checker thread")
-        checker_thread=threading.Thread(target=proc_checker)
-        checker_thread.start()
+        #debug_msg("starting checker thread")
+        #checker_thread=threading.Thread(target=proc_checker)
+        #checker_thread.start()
         debug_msg("run target")
-        #XXX NO! Popen, take pid, kill it when needed
-        #os.system("./launcher.py --batch %s >/dev/null" % exePath)
-        #os.system("./launcher.py --batch %s" % "../gdb/a.out")
         gdb_proc = subprocess.Popen("./launcher.py --batch %s &" % "../gdb/a.out", shell="/usr/bin/python")
-          
+        #XXX: wait for gdb to return  
         #empty_fuzzdir(fuzzDst)
     except KeyboardInterrupt:
         #close threads?
