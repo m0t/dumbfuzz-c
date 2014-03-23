@@ -31,7 +31,7 @@ def getSigma2(l, mean):
 #wait until process is not busy ("define busy?")
 #XXX blocking?
 #things: set timeout, some files can really take time, save long running files in case, 
-def wait_for_proc(pid, timeout):
+def wait_for_proc(pid, timeout, proc_dead):
     global debugFlag
     global GDB
     
@@ -74,12 +74,13 @@ def proc_checker(proc_dead):
         GDB.debug_msg('process dead')
         return
     timeout=threading.Event()
-    threading.Thread(target=timer_thread, args=[timeout, proc_dead]).start()
-    wait_for_proc(pid,timeout)
+    threading.Thread(target=timer_thread, args=[timeout]).start()
+    wait_for_proc(pid,timeout, proc_dead)
 
 def main():
     global GDB
            
+    #XXX: static args for testing
     gdbArgs='--impress --norestore'
     fpfile='fuzzed/fuzzed-100.ppt'
 

@@ -199,6 +199,7 @@ def main():
         gdb_proc = subprocess.Popen("./launcher.py --batch %s &" % "../gdb/a.out", shell="/usr/bin/python")
         #XXX: wait for gdb to return  
         #empty_fuzzdir(fuzzDst)
+        gdb_proc.wait() 
     except KeyboardInterrupt:
         #close threads?
         debug_msg("Ctrl-c detected, exiting")
