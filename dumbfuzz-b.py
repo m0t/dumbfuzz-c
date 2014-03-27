@@ -17,7 +17,7 @@ import sys
 
 ####GLOBAL###
 exePath="/usr/lib/libreoffice/program/soffice.bin"
-gdbArgs='--impress'
+exeArgs='--impress'
 #testcasesPath="/mnt/shared/ppt"
 crashesPath=""
 logsPath=""
@@ -83,7 +83,7 @@ def parse_args():
 
 def main():
     global exePath
-    global gdbArgs
+    global exeArgs
     global testcasesPath
     global fuzzDst
     global debugFlag
@@ -128,9 +128,9 @@ def main():
         debug_msg('bypassing all filelist conf while testing :)')
         #fuzz_testcase(fpfile, fuzzDst)
         #for file in os.listdir(fuzzDst):
-            #gdb.execute("file %s" % exePath)
-        debug_msg("run target")
-        gdb_proc = subprocess.Popen("./launcher.py --batch %s " % "../gdb/a.out", shell="/usr/bin/python")
+        fuzzedcase=os.listdir(fuzzDst)[0]
+        debug_msg("run target with file %s" % fuzzedcase)
+        gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedCase), shell="/usr/bin/python")
         #XXX: wait for gdb to return  
         #empty_fuzzdir(fuzzDst)
         gdb_proc.wait()

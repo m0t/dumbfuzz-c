@@ -81,13 +81,19 @@ def main():
     global GDB
            
     #XXX: static args for testing
-    gdbArgs='--impress --norestore'
-    fpfile='fuzzed/fuzzed-100.ppt'
+    #gdbArgs='--impress --norestore'
+    #fpfile='fuzzed/fuzzed-100.ppt'
 
     GDB = gdbwrapper.GDBWrapper()
 
     GDB.execute("set disassembly-flavor intel")
     GDB.execute("handle SIGSEGV stop print nopass")
+
+    args = GDB.get_arguments()
+    if args == None:
+        GDB.debug_msg("No arguments to the executable")
+    else: 
+        GDB.debug_msg("Arguments for exe: %s" % " ".join(args)) #not really but fine 
 
     GDB.debug_msg("starting checker thread")
     

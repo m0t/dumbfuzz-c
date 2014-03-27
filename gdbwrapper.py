@@ -168,6 +168,15 @@ class GDBWrapper(object):
         except:
             raise
         return True
+    
+    def get_arguments(self):
+        out = self.execute_redirect("show args")
+        #Argument list to give program being debugged when it is started is "20".
+        args = out.split("\"")[1:-1]
+        if args == "":
+            return None
+        else
+            return args
         
     def print(self, msg):
         gdb.write(msg+'\n')
