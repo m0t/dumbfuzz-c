@@ -175,7 +175,7 @@ class GDBWrapper(object):
         args = out.split("\"")[1:-1]
         if args == "":
             return None
-        else
+        else:
             return args
         
     def print(self, msg):

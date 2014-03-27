@@ -17,7 +17,7 @@ import sys
 
 ####GLOBAL###
 exePath="/usr/lib/libreoffice/program/soffice.bin"
-exeArgs='--impress'
+exeArgs='--impress --norestore'
 #testcasesPath="/mnt/shared/ppt"
 crashesPath=""
 logsPath=""
@@ -47,7 +47,7 @@ def die(msg):
 def debug_msg(msg):
     global debugFlag
     if debugFlag:
-        sys.stdout.write('[DEBUG] ' + msg + '\n')
+        sys.stdout.write('[FUZZER] ' + msg + '\n')
     return
 
 #receive full path of testcase, and dst dir
@@ -128,12 +128,14 @@ def main():
         debug_msg('bypassing all filelist conf while testing :)')
         #fuzz_testcase(fpfile, fuzzDst)
         #for file in os.listdir(fuzzDst):
-        fuzzedcase=os.listdir(fuzzDst)[0]
+        fuzzedcase=fuzzDst+"/"+os.listdir(fuzzDst)[0]
         debug_msg("run target with file %s" % fuzzedcase)
-        gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedCase), shell="/usr/bin/python")
-        #XXX: wait for gdb to return  
+        gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
+        mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+        #XXX: wait for procs to return  
         #empty_fuzzdir(fuzzDst)
         gdb_proc.wait()
+        mon_procs.wait()
         debug_msg('gdb terminated')
     except KeyboardInterrupt:
         #close threads?
