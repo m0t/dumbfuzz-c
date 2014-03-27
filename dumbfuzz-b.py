@@ -71,69 +71,6 @@ def fuzz_testcase(testcase, fuzzDst):
 def empty_fuzzdir(fuzzDst):
     os.system("rm -rf %s/*" % fuzzDst)
 
-'''
-#we should do this with gdb, idiot
-def get_process_pid(pname):
-
-    process = list(filter(lambda p: p.name == pname, psutil.process_iter()))
-    #there should be one and only one, check this
-    if len(process) == 0:
-        debug_msg("no process found")
-        return None
-    if len(process) > 1:
-        die("too many process, dying")
-    return process[0].pid
-
-def getSigma2(l, mean):
-    s2=[]
-    for i in l:
-        s2.append(i*i)
-    return (sum(s2)/len(s2))-(mean*mean)
-
-#wait until process is not busy ("define busy?")
-#XXX blocking?
-#things: set timeout, some files can really take time, save long running files in case, 
-def wait_for_proc(pid, timeout):
-    global debugFlag
-    interval=1.0      #in second
-    nslices=5
-    threshold=20    #in percent
-    p = psutil.Process(pid)
-    while not timeout.is_set():
-        cpu=[]
-        for i in range(0,nslices):
-            cpu.append(p.get_cpu_percent())
-            time.sleep(interval/nslices)
-        mean=sum(cpu)/len(cpu)
-        sigma2=getSigma2(cpu, mean)
-        debug_msg("avg process CPU usage: %d" % mean)
-        debug_msg("variance is: %d" % sigma2)
-    
-    debug_msg("timeout reached, killing the process and dying")
-    p.kill()
-
-#run in a separate thread, wait for process to load, kill it when it stop loading
-#XXX blocking?
-def proc_checker():
-    global exePath
-    
-    while True:        
-        pid=get_process_pid(os.path.basename(exePath) )
-        if pid:
-            debug_msg("pid found: %d ; starting timer thread" % pid)
-            timeout=threading.Event()
-            threading.Thread(target=timer_thread, args=[timeout]).start()
-            break
-        time.sleep(0.2)
-    wait_for_proc(pid,timeout)
-    
-
-def timer_thread(event):
-    global processTimeout
-    time.sleep(processTimeout)
-    event.set()
-'''
-
 def parse_args():
     parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
     parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
@@ -192,14 +129,12 @@ def main():
         #fuzz_testcase(fpfile, fuzzDst)
         #for file in os.listdir(fuzzDst):
             #gdb.execute("file %s" % exePath)
-        #debug_msg("starting checker thread")
-        #checker_thread=threading.Thread(target=proc_checker)
-        #checker_thread.start()
         debug_msg("run target")
-        gdb_proc = subprocess.Popen("./launcher.py --batch %s &" % "../gdb/a.out", shell="/usr/bin/python")
+        gdb_proc = subprocess.Popen("./launcher.py --batch %s " % "../gdb/a.out", shell="/usr/bin/python")
         #XXX: wait for gdb to return  
         #empty_fuzzdir(fuzzDst)
-        gdb_proc.wait() 
+        gdb_proc.wait()
+        debug_msg('gdb terminated')
     except KeyboardInterrupt:
         #close threads?
         debug_msg("Ctrl-c detected, exiting")

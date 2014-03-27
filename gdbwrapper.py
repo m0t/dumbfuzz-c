@@ -2,6 +2,7 @@
 # borrowing some code from PEDA for GDB, by Long Le Dinh <longld at vnsecurity.net>
 #
 
+import time
 import gdb
 from utils import *
 
@@ -71,7 +72,25 @@ class GDBWrapper(object):
             gdb.execute('set logging off') #to be sure
             logfd.close()
             raise e
-        return result
+        return result.decode('ascii')
+    
+    def getarch(self):
+        """
+        Get architecture of debugged program
+
+        Returns:
+            - tuple of architecture info (arch (String), bits (Int))
+        """
+        arch = "unknown"
+        bits = 32
+        out = self.execute_redirect('maintenance info sections ?').splitlines()
+        for line in out:
+            if "file type" in line:
+                arch = line.split()[-1][:-1]
+                break
+        if "64" in arch:
+            bits = 64
+        return (arch, bits)
         
     def get_status(self):
         """
@@ -86,8 +105,8 @@ class GDBWrapper(object):
         """
         status = "UNKNOWN"
         out = self.execute_redirect("info program")
-        for l in out.splitlines():
-            line=l.decode('ascii')
+        for line in out.splitlines():
+            #line=l.decode('ascii')
             if line.startswith("It stopped"):
                 if "signal" in line: # stopped by signal
                     status = line.split("signal")[1].split(",")[0].strip()
@@ -99,6 +118,56 @@ class GDBWrapper(object):
                 status = "STOPPED"
                 break
         return status
+    
+    def get_regs(self):
+        return self.execute_redirect("i reg")
+    
+    def get_callstack(self):
+        return self.execute_redirect("i stack")
+    
+    def get_codecontext(self):
+        arch,bits = self.getarch()
+        out=""
+        try:
+            if bits == 64:
+                out += self.execute_redirect("x/i $rip")
+            else: #32
+                out += self.execute_redirect("x/i $eip")
+        except gdb.MemoryError:
+            out += "can't access pc\n"
+        return out
+        
+    def get_stackcontext(self):
+        arch,bits = self.getarch()
+        out=""
+        try:
+            if bits == 64:
+                out += self.execute_redirect("x/16xg $rsp-64")
+            else: #32
+                out += self.execute_redirect("x/16xw $esp-32")
+        except gdb.MemoryError:
+            out += "can't access stack context\n"
+        return out
+
+    def write_crashdump(self, prefix, path, echo=False):
+        """
+        write crashdump to /path/prefix-timestamp.txt,
+        GDB.execute("x/16xg $rsp-64")
+        """
+        strtime=time.strftime('%d-%m-%y_%H%M')
+        try:
+            crashfile=open(path+prefix+"_"+strtime, 'w')
+            out=self.get_regs()
+            out+=self.get_callstack()
+            out+=self.get_codecontext()
+            out+=self.get_stackcontext()
+            crashfile.write(out)
+            if echo:
+                self.print(out)
+            crashfile.close()
+        except:
+            raise
+        return True
         
     def print(self, msg):
         gdb.write(msg+'\n')
@@ -110,7 +179,7 @@ class GDBWrapper(object):
         out = self.execute_redirect('info proc')
         if out is None: # non-Linux or cannot access /proc, fallback
             out = self.execute_redirect('info program')
-        out = out.splitlines()[0].decode('ascii')
+        out = out.splitlines()[0]
         if "process" in out or "Thread" in out:
             pid = out.split()[-1].strip(".)")
             return int(pid)

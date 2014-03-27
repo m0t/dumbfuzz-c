@@ -101,10 +101,9 @@ def main():
     proc_dead.set()
     state = GDB.get_status()
     if state != 'STOPPED':
-        #get context info, save to crashdump file, print some info, exit
-        GDB.execute("i reg")
-        GDB.execute("i stack")
-        GDB.execute("x/16xg $rsp-64")
+        #XXX save testcase with timestamp if we are here
+        GDB.debug_msg('Crash detected, saving crashdump and testcase')
+        GDB.write_crashdump('test', 'logs/', echo=True)
         sys.exit(1)
     else:
         GDB.debug_msg("Process terminated normally")
