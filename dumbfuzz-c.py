@@ -135,7 +135,7 @@ def main():
         #XXX: wait for procs to return  
         #empty_fuzzdir(fuzzDst)
         gdb_proc.wait()
-        mon_procs.wait()
+        mon_proc.wait()
         debug_msg('gdb terminated')
     except KeyboardInterrupt:
         #close threads?

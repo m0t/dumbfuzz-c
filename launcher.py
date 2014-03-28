@@ -17,10 +17,6 @@ GDB=None
 
 def main():
     global GDB
-           
-    #XXX: static args for testing
-    #gdbArgs='--impress --norestore'
-    #fpfile='fuzzed/fuzzed-100.ppt'
 
     GDB = gdbwrapper.GDBWrapper()
 
@@ -34,9 +30,6 @@ def main():
         GDB.debug_msg("Arguments for exe: %s" % " ".join(args)) #not really but fine 
 
 
-
-    #gdb.execute("file %s" % exePath)
-    #gdb.execute("r %s %s" % (gdbArgs,fpfile))
     GDB.execute('r')
     state = GDB.get_status()
     if state != 'STOPPED':

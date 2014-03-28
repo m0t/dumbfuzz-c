@@ -1,4 +1,7 @@
-dumbfuzz-a
+dumbfuzz-c
 ==========
 
-open some program on gdb, iterating over a bunch files, nothing new, usual stuff
+fuzz some files,
+launch target executable under gdb
+monitor process for faults
+save crashdumps if needed
