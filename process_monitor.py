@@ -8,6 +8,10 @@ import sys
 debugFlag=True
 processTimeout=20 #seconds
 
+def die(msg):
+    sys.stderr.write( msg + "\n")
+    sys.exit(-1)
+
 def timer_thread(event):
     global processTimeout
     time.sleep(processTimeout)
@@ -39,14 +43,14 @@ def find_proc(file, args):
 #wait until process is not busy ("define busy?")
 #XXX blocking?
 #things: set timeout, some files can really take time, save long running files in case, 
-def wait_for_proc(pid, timeout, proc_dead):
+def wait_for_proc(pid, timeout):
     global debugFlag
     
     interval=1.0      #in second
     nslices=5
     threshold=20    #in percent
     p = psutil.Process(pid)
-    while not timeout.is_set() and not proc_dead.is_set():
+    while not timeout.is_set():
         if not p.is_running():
             debug_msg("Checker lost the process")
             return
@@ -59,12 +63,10 @@ def wait_for_proc(pid, timeout, proc_dead):
         debug_msg("avg process CPU usage: %d" % mean)
         debug_msg("variance is: %d" % sigma2)
     
-    if proc_dead.is_set():
-        debug_msg('process dead')
-        return
     debug_msg("timeout reached, killing the process and dying")
     p.kill()
 
+'''
 def proc_checker(proc_dead):
     while not proc_dead.is_set():
         pid = find_proc()
@@ -78,13 +80,29 @@ def proc_checker(proc_dead):
     timeout=threading.Event()
     threading.Thread(target=timer_thread, args=[timeout]).start()
     wait_for_proc(pid,timeout, proc_dead)
+'''
 
 def main():
-    GDB.debug_msg("starting checker thread")
     
-    proc_dead = threading.Event()
-    checker_thread=threading.Thread(target=proc_checker, args=[proc_dead])
-    checker_thread.start()
-    #proc_dead.set()
+    #checker_thread=threading.Thread(target=proc_checker, args=[proc_dead])
+    #checker_thread.start()
+    if len(sys.argv) != 3:
+        die("%s <executable> <searchargs>" % sys.argv(0))
+        
+    exeFile=sys.argv(1)
+    exeArgs=sys.argv(2)
+       
+    while True:
+        pid = find_proc(exeFile, exeArgs)
+        #actually better catch this, even if still early
+        if not p.is_running():
+            debug_msg('process dead before starting timer')
+            return
+        if pid != None:
+            break
+    debug_msg("pid found: %d ; starting timer thread" % pid)
+    timeout=threading.Event()
+    threading.Thread(target=timer_thread, args=[timeout]).start()
+    wait_for_proc(pid,timeout)
 
 main()
