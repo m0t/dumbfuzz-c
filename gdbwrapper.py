@@ -125,6 +125,9 @@ class GDBWrapper(object):
     def get_callstack(self):
         return self.execute_redirect("i stack")
     
+    def get_programcontext(self):
+        return self.execute_redirect("i file")
+        
     def get_codecontext(self):
         arch,bits = self.getarch()
         out=""
@@ -156,7 +159,8 @@ class GDBWrapper(object):
         """
         strtime=time.strftime('%d-%m-%y_%H%M')
         try:
-            crashfile=open(path+prefix+"_"+strtime, 'w')
+            crashfile=open(path+prefix+"_"+strtime+'.txt', 'w')
+            #XXX out = self.get_programcontext()
             out=self.get_regs()
             out+=self.get_callstack()
             out+=self.get_codecontext()

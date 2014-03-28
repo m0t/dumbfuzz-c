@@ -56,35 +56,42 @@ def wait_for_proc(pid, timeout):
     
     p = psutil.Process(pid)
     while not timeout.is_set():
-        if not p.is_running():
+        try:
+            
+            cpu=[]
+            for i in range(0,nslices):
+                cpu.append(p.get_cpu_percent())
+                time.sleep(interval/nslices)
+            mean=sum(cpu)/len(cpu)
+            sigma2=getSigma2(cpu, mean)
+            debug_msg("avg process CPU usage: %d" % mean)
+            debug_msg("variance is: %d" % sigma2)
+    
+            #decision rules
+            weight=0
+            if mean == 0:
+                weight += 0.3
+            elif mean < 10:
+                weight += 0.2
+            elif mean > 50 and sigma2 > 100:
+                weight -= 0.2
+            if sigma2 == 0:
+                weight += 0.2
+            elif sigma2 <= 100:
+                weight += 0.1
+            elif sigma2 > 200:
+                weight -= 0.2
+            votes += weight
+        
+            if votes < 0:
+                votes = 0
+            if votes >= quorum:
+                debug_msg("Quorum reached, killing process")
+                p.kill()
+                return
+        except psutil.NoSuchProcess:
             debug_msg("Checker lost the process")
             return
-            
-        cpu=[]
-        for i in range(0,nslices):
-            cpu.append(p.get_cpu_percent())
-            time.sleep(interval/nslices)
-        mean=sum(cpu)/len(cpu)
-        sigma2=getSigma2(cpu, mean)
-        debug_msg("avg process CPU usage: %d" % mean)
-        debug_msg("variance is: %d" % sigma2)
-    
-        #decision rules
-        weight=0
-        if mean == 0:
-            weight += 0.3
-        elif mean < 10:
-            weight += 0.2
-        if sigma2 == 0:
-            weight += 0.2
-        elif sigma2 <= 100:
-            weight += 0.1
-        votes += weight
-        if votes >= quorum:
-            debug_msg("Quorum reached, killing process")
-            p.kill()
-            return
-    
     debug_msg("timeout reached, killing the process and dying")
     p.kill()
 
