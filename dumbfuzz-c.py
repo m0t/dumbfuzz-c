@@ -127,20 +127,24 @@ def main():
         #XXX debug_msg('fuzzing file #%d' % 0)
         debug_msg('bypassing all filelist conf while testing :)')
         #fuzz_testcase(fpfile, fuzzDst)
-        #for file in os.listdir(fuzzDst):
-        fuzzedcase=fuzzDst+"/"+os.listdir(fuzzDst)[0]
-        debug_msg("run target with file %s" % fuzzedcase)
-        gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
-        mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
-        #XXX: wait for procs to return  
-        #empty_fuzzdir(fuzzDst)
-        gdb_proc.wait()
-        mon_proc.wait()
-        debug_msg('gdb terminated')
+        for file in os.listdir(fuzzDst):            
+            fuzzedcase=fuzzDst + "/" + file
+            debug_msg("run target with file %s" % fuzzedcase)
+            gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
+            mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+            #XXX: wait for procs to return  
+            #empty_fuzzdir(fuzzDst)
+            gdb_proc.wait()
+            mon_proc.wait()
+            debug_msg('Terminated fuzzing %s' % fuzzedcase)
     except KeyboardInterrupt:
-        #close threads?
         debug_msg("Ctrl-c detected, exiting")
-        gdb_proc.kill()
+        try:
+            gdb_proc.kill()
+            mon_proc.kill()
+        except:
+            pass
+            
         sys.exit(0)
 
 
