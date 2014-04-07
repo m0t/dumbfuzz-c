@@ -133,7 +133,7 @@ def main():
             start=int(opts.skipto)
         for i in range(start,len(filelist)):
             f = filelist[i]
-            debug_msg('fuzzing testcase #%d : %s' % (i,fpfile))
+            debug_msg('fuzzing testcase #%d : %s' % (i,f))
             if not opts.nofuzz:
                 fuzz_testcase(f, fuzzDst)
             for file in os.listdir(fuzzDst):            
