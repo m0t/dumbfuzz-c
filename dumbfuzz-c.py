@@ -117,7 +117,7 @@ def main():
     
     if opts.saveList:
         debug_msg("saving list of files to %s" % listfile)
-        lf = open(listfile)
+        lf = open(listfile, 'w')
         lf.write("\n".join([str(i) for i in filelist]))
         lf.close()
     
@@ -133,11 +133,11 @@ def main():
         for i in range(start,len(filelist)):
             f = filelist[i]
             fpfile="%s/%s" % (testcasesPath, f)
-            debug_msg('fuzzing file #%d' % 0)
+            debug_msg('fuzzing testcase #%d : %s' % (i,fpfile))
             if not opts.nofuzz:
                 fuzz_testcase(fpfile, fuzzDst)
             for file in os.listdir(fuzzDst):            
-                fuzzedcase=fuzzDst + "/v b" + file
+                fuzzedcase=fuzzDst + "/" + file
                 debug_msg("run target with file %s" % fuzzedcase)
                 gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
                 mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
