@@ -102,6 +102,7 @@ def main():
     if opts.fuzzdir:
         testcasesPath=opts.fuzzdir
         filelist=os.listdir(testcasesPath)
+        filelist=[testcasePath+'/'+ tc for tc in filelist]
     if opts.filelist:
         if opts.saveList:
             debug_msg("already loading from filelist, unsetting writing")
