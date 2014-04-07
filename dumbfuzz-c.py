@@ -102,7 +102,7 @@ def main():
     if opts.fuzzdir:
         testcasesPath=opts.fuzzdir
         filelist=os.listdir(testcasesPath)
-        filelist=[testcasePath+'/'+ tc for tc in filelist]
+        filelist=[testcasesPath+'/'+ tc for tc in filelist]
     if opts.filelist:
         if opts.saveList:
             debug_msg("already loading from filelist, unsetting writing")
@@ -133,10 +133,9 @@ def main():
             start=int(opts.skipto)
         for i in range(start,len(filelist)):
             f = filelist[i]
-            fpfile="%s/%s" % (testcasesPath, f)
             debug_msg('fuzzing testcase #%d : %s' % (i,fpfile))
             if not opts.nofuzz:
-                fuzz_testcase(fpfile, fuzzDst)
+                fuzz_testcase(f, fuzzDst)
             for file in os.listdir(fuzzDst):            
                 fuzzedcase=fuzzDst + "/" + file
                 debug_msg("run target with file %s" % fuzzedcase)
