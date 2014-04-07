@@ -50,6 +50,9 @@ def debug_msg(msg):
         sys.stdout.write('[FUZZER] ' + msg + '\n')
     return
 
+def quotestring(s):
+    return "\\'".join("'" + p + "'" for p in s.split("'"))
+
 #receive full path of testcase, and dst dir
 #write target files
 def fuzz_testcase(testcase, fuzzDst):
@@ -59,10 +62,10 @@ def fuzz_testcase(testcase, fuzzDst):
         debug_msg("creating dir %s\n" % (fuzzDst))
         os.mkdir(fuzzDst)
     if debugFlag:
-        fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, testcase)
+        fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, quotestring(testcase))
         debug_msg(fuzzCmd)
     else:
-        fuzzCmd = "%s -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, testcase)
+        fuzzCmd = "%s -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, quotestring(testcase))
     ret = os.system(fuzzCmd)
     if (ret != 0):
         die("fuzzer failed to run")
