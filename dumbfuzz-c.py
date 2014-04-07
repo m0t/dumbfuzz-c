@@ -107,7 +107,7 @@ def main():
             debug_msg("already loading from filelist, unsetting writing")
             opts.saveList = False
         try:
-            lf=open(opts.saveList)
+            lf=open(opts.filelist)
             filelist=lf.read().split('\n')
         except:
             die('Impossible to load file list, check file and syntax')
