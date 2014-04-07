@@ -75,6 +75,8 @@ def parse_args():
     parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
     parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
     parser.add_option("-s", "--export", help="save filelist.txt ", action="store_true", dest="saveList", default=False)
+    parser.add_option("-t", "--nofuzz", help="start fuzzer, dont generate testcases, for TESTING", action="store_true", dest="nofuzz", default=False)
+    parser.add_option("-T", "--test", help="don't start fuzzer, for TESTING", action="store_true", dest="testrun", default=False)
     parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
     parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
     parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
@@ -119,24 +121,38 @@ def main():
         lf.write("\n".join([str(i) for i in filelist]))
         lf.close()
     
+    if opts.testrun:
+        debug_msg("testrun only, exiting")
+        sys.exit(0)
+    
     #XXX: why is this try here?
     try:
-        #XXX skipto
-        f=filelist[0]
-        fpfile="%s/%s" % (testcasesPath, f)
-        #XXX debug_msg('fuzzing file #%d' % 0)
-        debug_msg('bypassing all filelist conf while testing :)')
-        #fuzz_testcase(fpfile, fuzzDst)
-        for file in os.listdir(fuzzDst):            
-            fuzzedcase=fuzzDst + "/" + file
-            debug_msg("run target with file %s" % fuzzedcase)
-            gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
-            mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
-            #XXX: wait for procs to return  
-            #empty_fuzzdir(fuzzDst)
-            gdb_proc.wait()
-            mon_proc.wait()
-            debug_msg('Terminated fuzzing %s' % fuzzedcase)
+        start=0
+        if opts.skipto:
+            start=int(opts.skipto)
+        for i in range(start,len(filelist)):
+            f = filelist[i]
+            fpfile="%s/%s" % (testcasesPath, f)
+            debug_msg('fuzzing file #%d' % 0)
+            if not opts.nofuzz:
+                fuzz_testcase(fpfile, fuzzDst)
+            for file in os.listdir(fuzzDst):            
+                fuzzedcase=fuzzDst + "/v b" + file
+                debug_msg("run target with file %s" % fuzzedcase)
+                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
+                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+                if not opts.nofuzz:
+                    debug_msg("nofuzz set, will not destroy testcases")
+                    empty_fuzzdir(fuzzDst)
+                if not opts.nofuzz:
+                gdb_proc.wait()
+                mon_proc.wait()
+                debug_msg('Terminated fuzzing %s' % fuzzedcase)
+            if opts.nofuzz:
+                debug_msg("nofuzz set, will only do first iteration")
+                #gdb_proc.kill()
+                #mon_proc.kill()
+                sys.exit(0)
     except KeyboardInterrupt:
         debug_msg("Ctrl-c detected, exiting")
         try:
