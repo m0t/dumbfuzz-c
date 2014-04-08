@@ -83,8 +83,10 @@ def wait_for_proc(pid, timeout):
                 weight -= 0.2
             if sigma2 == 0:
                 weight += 0.2
-            elif sigma2 <= 100:
+            elif sigma2 <= 100 and mean <= 40:
                 weight += 0.1
+            elif sigma2 <= 100 and mean > 40:
+                weight += 0.05
             elif sigma2 > 200:
                 weight -= 0.2
             votes += weight
