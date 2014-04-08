@@ -26,7 +26,7 @@ def get_inputfile(args):
     return False
 
 def check_logdir(logpath):
-    if not os.path.exists(logpath)
+    if not os.path.exists(logpath):
         GDB.debug_msg("logs dir not found, creating")
     try:
         os.mkdir(logpath)
