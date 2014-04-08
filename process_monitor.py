@@ -42,6 +42,12 @@ def find_proc(file, args):
         return None
     return pids
 
+#immediately kill and exit
+def kill_proc_and_exit(p):
+    p.kill()
+    debug_msg("exiting")
+    sys.exit(0)
+
 #wait until process is not busy ("define busy?")
 #XXX blocking?
 #things: set timeout, some files can really take time, save long running files in case, 
@@ -87,13 +93,12 @@ def wait_for_proc(pid, timeout):
                 votes = 0
             if votes >= quorum:
                 debug_msg("Quorum reached, killing process")
-                p.kill()
-                return
+                kill_proc_and_exit(p)
         except psutil.NoSuchProcess:
             debug_msg("Checker lost the process")
             return
     debug_msg("timeout reached, killing the process and dying")
-    p.kill()
+    kill_proc_and_exit(p)
 
 def check_psutil():
     if psutil.version_info[0] == 2:

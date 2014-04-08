@@ -144,18 +144,19 @@ def main():
                 debug_msg("run target with file %s" % fuzzedcase)
                 gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
                 mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
-                if not opts.nofuzz:
-                    debug_msg("nofuzz set, will not destroy testcases")
-                else:
-                    empty_fuzzdir(fuzzDst)
+
                 gdb_proc.wait()
                 mon_proc.wait()
-                debug_msg('Terminated fuzzing %s' % fuzzedcase)
-            if opts.nofuzz:
-                debug_msg("nofuzz set, will only do first iteration")
-                #gdb_proc.kill()
-                #mon_proc.kill()
-                sys.exit(0)
+            debug_msg('Terminated fuzzing %s' % fuzzedcase)
+            if  opts.nofuzz:
+                debug_msg("nofuzz set, will not destroy testcases")
+            else:
+                empty_fuzzdir(fuzzDst)
+        if opts.nofuzz:
+            debug_msg("nofuzz set, will only do first iteration")
+            #gdb_proc.kill()
+            #mon_proc.kill()
+            sys.exit(0)
     except KeyboardInterrupt:
         debug_msg("Ctrl-c detected, exiting")
         try:
