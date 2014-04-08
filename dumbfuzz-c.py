@@ -83,6 +83,7 @@ def parse_args():
     parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
     parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
     parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
+    parser.add_option("-C", "--cleanup", help="run some script for cleanup after fuzz iteration", dest="cleanup", default=None)
     
     return parser.parse_args()
 
@@ -129,6 +130,9 @@ def main():
         debug_msg("testrun only, exiting")
         sys.exit(0)
     
+    if opts.cleanup:
+        cleanupscript=opts.cleanup
+    
     #XXX: why is this try here?
     try:
         start=0
@@ -152,8 +156,15 @@ def main():
                 debug_msg("nofuzz set, will not destroy testcases")
             else:
                 empty_fuzzdir(fuzzDst)
-        if opts.nofuzz:
-            debug_msg("nofuzz set, will only do first iteration")
+            if cleanupscript:
+                debug_msg("running cleanup script %s" % cleanupscript)
+                try:
+                    cleanup_proc = subprocess.Popen("./%s" % cleanupscript, shell="/usr/bin/bash")
+                    cleanup_proc.wait()
+                except:
+                    debug_msg("error trying to run cleanup script")
+            if opts.nofuzz:
+                debug_msg("nofuzz set, will only do first iteration")
             #gdb_proc.kill()
             #mon_proc.kill()
             sys.exit(0)
