@@ -146,7 +146,7 @@ def main():
                 mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
 
                 gdb_proc.wait()
-                mon_proc.wait()
+                mon_proc.kill()
             debug_msg('Terminated fuzzing %s' % fuzzedcase)
             if  opts.nofuzz:
                 debug_msg("nofuzz set, will not destroy testcases")
