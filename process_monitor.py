@@ -3,10 +3,13 @@
 import threading
 import psutil
 import time
+import os
+import shutil
 import sys
 
 debugFlag=True
 processTimeout=20 #seconds
+savedir="saved" #where to save testcase if interesting but not catched by debugger
 
 def die(msg):
     sys.stderr.write("MONITOR ERROR" + msg + "\n")
@@ -48,11 +51,35 @@ def kill_proc_and_exit(p):
     debug_msg("exiting")
     sys.exit(0)
 
+def check_dir(dir):
+    if not os.path.exists(dir):
+        debug_msg("saved dir not found, creating")
+        try:
+            os.mkdir(dir)
+        except PermissionError:
+            debug_msg("saved dir creation failed, dying")
+            sys.exit(-1)
+
+def save_testcase(file):
+    global savedir
+    check_logdir(savedir)
+    strtime=time.strftime('%d-%m-%y_%H%M')
+    savefile="fuzzedcase-"+strtime
+    debug_msg('Saving testcase to ' + savefile)
+    shutil.copy(file, savedir+'/'+savefile)
+
 #wait until process is not busy ("define busy?")
 #XXX blocking?
-#things: set timeout, some files can really take time, save long running files in case, 
-def wait_for_proc(pid, timeout):
+#things: set timeout, some files can really take time, save long running files in case,
+#if proc_arg is provided, will save that file is deemed necessary
+def wait_for_proc(pid, timeout, proc_arg=None):
     global debugFlag
+    
+    save_arg=False
+    if proc_arg:
+        save_arg=True
+    save_votes=0
+    save_quorum=1
     
     interval=1.0      #in second
     nslices=5
@@ -87,6 +114,8 @@ def wait_for_proc(pid, timeout):
                 weight += 0.1
             elif sigma2 <= 100 and mean > 40:
                 weight += 0.05
+                if votes == quorum and save_arg==True:
+                    save_votes=1
             elif sigma2 > 200:
                 weight -= 0.2
             votes += weight
@@ -96,6 +125,8 @@ def wait_for_proc(pid, timeout):
             if votes >= quorum:
                 debug_msg("Quorum reached, killing process")
                 kill_proc_and_exit(p)
+                if save_arg and save_votes==save_quorum:
+                    save_testcase(proc_arg)
         except psutil.NoSuchProcess:
             debug_msg("Checker lost the process")
             return
@@ -127,7 +158,7 @@ def main():
         #actually better catch this, even if still early
         if pids != None:
             if len(pids) > 1:
-                debug_msg("found %d process, will use %d" % (len(pids), pids[0] ))
+                debug_msg("found %d process, will monitor %d" % (len(pids), pids[0] ))
             p=psutil.Process(pids[0])
             if not p.is_running():
                 debug_msg('process dead before starting timer')
