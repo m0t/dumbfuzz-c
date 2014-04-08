@@ -28,11 +28,11 @@ def get_inputfile(args):
 def check_logdir(logpath):
     if not os.path.exists(logpath):
         GDB.debug_msg("logs dir not found, creating")
-    try:
-        os.mkdir(logpath)
-    except:
-        GDB.debug_msg("log dir creation failed, dying")
-        sys.exit(-1)
+        try:
+            os.mkdir(logpath)
+        except PermissionError:
+            GDB.debug_msg("log dir creation failed, dying")
+            sys.exit(-1)
 
 def main():
     global GDB
