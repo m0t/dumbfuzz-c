@@ -25,12 +25,22 @@ def get_inputfile(args):
         return inputfile
     return False
 
+def check_logdir(logpath):
+    if not os.path.exists(logpath)
+        GDB.debug_msg("logs dir not found, creating")
+    try:
+        os.mkdir(logpath)
+    except:
+        GDB.debug_msg("log dir creation failed, dying")
+        sys.exit(-1)
 
 def main():
     global GDB
     global logpath
 
     GDB = gdbwrapper.GDBWrapper()
+
+    check_logdir(logpath)
 
     GDB.execute("set disassembly-flavor intel")
     GDB.execute("handle SIGSEGV stop print nopass")
