@@ -139,6 +139,9 @@ def wait_for_proc(pid, timeout, proc_arg=None):
             debug_msg("Checker lost the process")
             return
     debug_msg("timeout reached, killing the process and dying")
+    if save_arg:
+        debug_msg("Interesting file found, saving testcase")
+        save_testcase(proc_arg)
     kill_proc_and_exit(p)
 
 def check_psutil():
