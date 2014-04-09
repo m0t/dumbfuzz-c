@@ -139,7 +139,7 @@ def main():
         sys.exit(0)
     
     if opts.cleanup:
-        cleanupscript=opts.cleanup
+        cscript=opts.cleanup
     
     #XXX: why is this try here?
     try:
@@ -166,7 +166,7 @@ def main():
             else:
                 empty_fuzzdir(fuzzDst)
             if cleanupscript:
-                cleanupscript(cleanupscript)
+                cleanupscript(cscript)
             if opts.nofuzz:
                 debug_msg("nofuzz set, will only do first iteration")
             #gdb_proc.kill()
@@ -180,7 +180,7 @@ def main():
         except:
             pass
         if cleanupscript:
-            cleanupscript(cleanupscript)    
+            cleanupscript(cscript)    
         sys.exit(0)
 
 
