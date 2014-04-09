@@ -160,7 +160,7 @@ def main():
 
                 gdb_proc.wait()
                 mon_proc.kill()
-            debug_msg('Terminated fuzzing %s' % fuzzedcase)
+            debug_msg('Terminated fuzzing %s' % f)
             if  opts.nofuzz:
                 debug_msg("nofuzz set, will not destroy testcases")
             else:
@@ -171,7 +171,6 @@ def main():
                 debug_msg("nofuzz set, will only do first iteration")
             #gdb_proc.kill()
             #mon_proc.kill()
-            sys.exit(0)
     except KeyboardInterrupt:
         debug_msg("Ctrl-c detected, exiting")
         try:
