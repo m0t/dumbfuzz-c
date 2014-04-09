@@ -100,7 +100,7 @@ def wait_for_proc(pid, timeout, proc_arg=None):
             debug_msg("avg process CPU usage: %d" % mean)
             debug_msg("variance is: %d" % sigma2)
     
-            #decision rules
+            #######DECISION RULES
             weight=0
             if mean == 0:
                 weight += 0.3
@@ -110,6 +110,8 @@ def wait_for_proc(pid, timeout, proc_arg=None):
                 weight -= 0.2
             if sigma2 == 0:
                 weight += 0.2
+                if mean > 40 and votes == quorum and save_arg==True:
+                    save_votes=1
             elif sigma2 <= 100 and mean <= 40:
                 weight += 0.1
             elif sigma2 <= 100 and mean > 40:
@@ -118,6 +120,7 @@ def wait_for_proc(pid, timeout, proc_arg=None):
                     save_votes=1
             elif sigma2 > 200:
                 weight -= 0.2
+            #########END OF RULES
             votes += weight
         
             if votes < 0:
@@ -126,6 +129,7 @@ def wait_for_proc(pid, timeout, proc_arg=None):
                 debug_msg("Quorum reached, killing process")
                 kill_proc_and_exit(p)
                 if save_arg and save_votes==save_quorum:
+                    debug_msg("Interesting file found, saving testcase")
                     save_testcase(proc_arg)
         except psutil.NoSuchProcess:
             debug_msg("Checker lost the process")
