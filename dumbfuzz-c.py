@@ -179,7 +179,7 @@ def main():
             mon_proc.kill()
         except:
             pass
-        if cleanupscript:
+        if cscript:
             cleanupscript(cscript)    
         sys.exit(0)
 
