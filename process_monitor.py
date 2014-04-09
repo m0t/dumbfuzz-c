@@ -29,7 +29,11 @@ def getSigma2(l, mean):
 def debug_msg(msg):
     global debugFlag
     if debugFlag:
-        sys.stdout.write('[MONITOR] ' + msg + '\n')
+        #well, really a best effort thing
+        try:
+            sys.stdout.write('[MONITOR] ' + msg + '\n')
+        except:
+            pass 
     return
 
 #search the file in the name, then search other args in the cmdline
