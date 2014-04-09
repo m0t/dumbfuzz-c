@@ -182,6 +182,6 @@ def main():
     debug_msg("pid found: %d ; starting timer thread" % p.pid)
     timeout=threading.Event()
     threading.Thread(target=timer_thread, args=[timeout]).start()
-    wait_for_proc(p.pid,timeout, exeArgs)
+    wait_for_proc(p.pid,timeout, proc_args=exeArgs)
 
 main()
