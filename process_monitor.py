@@ -114,13 +114,13 @@ def wait_for_proc(pid, timeout, proc_arg=None):
                 weight -= 0.2
             if sigma2 == 0:
                 weight += 0.2
-                if mean > 40 and votes == quorum and save_arg==True:
+                if mean > 40 and votes >= quorum and save_arg==True:
                     save_votes=1
             elif sigma2 <= 100 and mean <= 40:
                 weight += 0.1
             elif sigma2 <= 100 and mean > 40:
                 weight += 0.05
-                if votes == quorum and save_arg==True:
+                if votes >= quorum and save_arg==True:
                     save_votes=1
             elif sigma2 > 200:
                 weight -= 0.2
@@ -132,7 +132,7 @@ def wait_for_proc(pid, timeout, proc_arg=None):
             if votes >= quorum:
                 debug_msg("Quorum reached, killing process")
                 kill_proc_and_exit(p)
-                if save_arg and save_votes==save_quorum:
+                if save_arg and save_votes>=save_quorum:
                     debug_msg("Interesting file found, saving testcase")
                     save_testcase(proc_arg)
         except psutil.NoSuchProcess:
