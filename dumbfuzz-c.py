@@ -74,6 +74,14 @@ def fuzz_testcase(testcase, fuzzDst):
 def empty_fuzzdir(fuzzDst):
     os.system("rm -rf %s/*" % fuzzDst)
 
+def cleanupscript(script):
+    debug_msg("running cleanup script %s" % script)
+    try:
+        cleanup_proc = subprocess.Popen("./%s" % script, shell="/usr/bin/bash")
+        cleanup_proc.wait()
+    except:
+        debug_msg("error trying to run cleanup script")
+
 def parse_args():
     parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
     parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
@@ -157,12 +165,7 @@ def main():
             else:
                 empty_fuzzdir(fuzzDst)
             if cleanupscript:
-                debug_msg("running cleanup script %s" % cleanupscript)
-                try:
-                    cleanup_proc = subprocess.Popen("./%s" % cleanupscript, shell="/usr/bin/bash")
-                    cleanup_proc.wait()
-                except:
-                    debug_msg("error trying to run cleanup script")
+                cleanupscript(cleanupscript)
             if opts.nofuzz:
                 debug_msg("nofuzz set, will only do first iteration")
             #gdb_proc.kill()
@@ -175,7 +178,8 @@ def main():
             mon_proc.kill()
         except:
             pass
-            
+        if cleanupscript:
+            cleanupscript(cleanupscript)    
         sys.exit(0)
 
 
