@@ -66,7 +66,7 @@ def check_dir(dir):
 
 def save_testcase(file):
     global savedir
-    check_logdir(savedir)
+    check_dir(savedir)
     strtime=time.strftime('%d-%m-%y_%H%M')
     savefile="fuzzedcase-"+strtime
     debug_msg('Saving testcase to ' + savefile)
