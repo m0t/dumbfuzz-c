@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
 '''
-gdb python script
-
-notes:
-    - you should avoid running manually the same target program while this is running, get_process_pid will not like it
+fuzzer script, it will:
+- fuzz the testcases and create some fuzzed files, and for each of these:
+- launch the gdb script (in its own process) which runs the target process and checks for faults
+- launch the process_monitor script (in its own process) which check when it's to time to weed the unfruitful processes
 '''
 
+import logging as l
 import subprocess
 import optparse
 import threading
@@ -28,7 +29,10 @@ restoreFlag = False
 debugFlag = True
 processTimeout=20 #seconds
 listfile='filelist.txt'
+logFlag=True
 
+#XXX: create a fuzzer class and move this kind of stuff inside, settings should have its own file
+logger=None
 
 #############
 
@@ -46,12 +50,39 @@ def die(msg):
 
 def debug_msg(msg):
     global debugFlag
+    global logFlag
+    global logger
+    #XXX this should be done better
+    if logFlag:
+        if logger == None:
+            setup_logger()
+        logger.warn(msg)
     if debugFlag:
         sys.stdout.write('[FUZZER] ' + msg + '\n')
     return
 
 def quotestring(s):
     return "\\'".join("'" + p + "'" for p in s.split("'"))
+
+def setup_logger():
+    global logger
+    logger = l.getLogger("errorlog")
+    if debug:
+        logger.setLevel(l.INFO)
+    else:
+        logger.setLevel(l.WARN)
+
+    fh=l.FileHandler("./dumbfuzz.log")
+    if debug:
+        fh.setLevel(l.INFO)
+    else:
+        fh.setLevel(l.WARN)
+
+    fmt=l.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+    fh.setFormatter(fmt)
+
+    logger.addHandler(fh)
+    return logger
 
 #receive full path of testcase, and dst dir
 #write target files
