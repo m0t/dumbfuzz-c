@@ -73,7 +73,7 @@ def setup_logger():
         logger.setLevel(l.WARN)
 
     fh=l.FileHandler("./dumbfuzz.log")
-    if debug:
+    if debugFlag:
         fh.setLevel(l.INFO)
     else:
         fh.setLevel(l.WARN)
