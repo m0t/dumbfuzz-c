@@ -67,7 +67,7 @@ def quotestring(s):
 def setup_logger():
     global logger
     logger = l.getLogger("errorlog")
-    if debug:
+    if debugFlag:
         logger.setLevel(l.INFO)
     else:
         logger.setLevel(l.WARN)
