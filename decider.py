@@ -17,7 +17,7 @@ class Decider(Object):
         
         #run decision rules, all vars should be already declared at this point
         code=compile(open(rules_file).read(),'<string>','exec')
-        exec code
+        exec(code)
 
         self.votes += weight
         return True
