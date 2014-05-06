@@ -7,6 +7,8 @@ import os
 import shutil
 import sys
 
+from decider *
+
 debugFlag=True
 processTimeout=20 #seconds
 savedir="saved" #where to save testcase if interesting but not catched by debugger
@@ -82,16 +84,22 @@ def wait_for_proc(pid, timeout, proc_arg=None):
     save_arg=False
     if proc_arg:
         save_arg=True
+    
+    '''
+    XXX remove from here
     save_votes=0
     save_quorum=1
+    votes=0
+    quorum=1
+    '''
     
     interval=1.0      #in second
     nslices=5
     
-    votes=0
-    quorum=1
+    decider = Decider(save_arg)
     
     p = psutil.Process(pid)
+    timecounter = 0
     while not timeout.is_set():
         try:
             
@@ -101,38 +109,18 @@ def wait_for_proc(pid, timeout, proc_arg=None):
                 time.sleep(interval/nslices)
             mean=sum(cpu)/len(cpu)
             sigma2=getSigma2(cpu, mean)
+            timecounter+=1
             debug_msg("avg process CPU usage: %d" % mean)
             debug_msg("variance is: %d" % sigma2)
     
-            #######DECISION RULES
-            weight=0
-            if mean == 0:
-                weight += 0.3
-            elif mean < 10:
-                weight += 0.2
-            elif mean > 50 and sigma2 > 100:
-                weight -= 0.2
-            if sigma2 == 0:
-                weight += 0.2
-                if mean > 40 and votes >= quorum and save_arg==True:
-                    save_votes=1
-            elif sigma2 <= 100 and mean <= 40:
-                weight += 0.1
-            elif sigma2 <= 100 and mean > 40:
-                weight += 0.05
-                if votes >= quorum and save_arg==True:
-                    save_votes=1
-            elif sigma2 > 200:
-                weight -= 0.2
-            #########END OF RULES
-            votes += weight
+            decider.update(mean, sigma2, timecounter)
         
-            if votes < 0:
-                votes = 0
-            if votes >= quorum:
+            #if votes < 0:
+            #    votes = 0
+            if decider.isQuorumReached()
                 debug_msg("Quorum reached, killing process")
                 kill_proc_and_exit(p)
-                if save_arg and save_votes>=save_quorum:
+                if save_arg and decider.isSaveQuorumReached():
                     debug_msg("Interesting file found, saving testcase")
                     save_testcase(proc_arg)
         except psutil.NoSuchProcess:
