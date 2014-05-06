@@ -7,7 +7,7 @@ import os
 import shutil
 import sys
 
-from decider *
+from decider import *
 
 debugFlag=True
 processTimeout=20 #seconds
