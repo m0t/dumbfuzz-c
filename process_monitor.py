@@ -117,7 +117,7 @@ def wait_for_proc(pid, timeout, proc_arg=None):
         
             #if votes < 0:
             #    votes = 0
-            if decider.isQuorumReached()
+            if decider.isQuorumReached():
                 debug_msg("Quorum reached, killing process")
                 kill_proc_and_exit(p)
                 if save_arg and decider.isSaveQuorumReached():
