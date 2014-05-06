@@ -1,4 +1,4 @@
-class Decider(Object):
+class Decider(object):
     quorum=1
     save_quorum=1
     rules_file='decision_rules.py'    
