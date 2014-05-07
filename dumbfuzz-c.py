@@ -46,7 +46,10 @@ def debug_msg(msg):
             setup_logger()
         logger.warn(msg)
     if debugFlag:
-        sys.stdout.write('[FUZZER] ' + msg + '\n')
+        try:
+            sys.stdout.write('[FUZZER] ' + msg + '\n')
+        except BlockingIOError:
+            logger.warn('detected IO error while writing to stdout')
     return
 
 def quotestring(s):
