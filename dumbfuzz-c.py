@@ -196,7 +196,7 @@ def main():
                 debug_msg("nofuzz set, will not destroy testcases")
             else:
                 empty_fuzzdir(fuzzDst)
-            if cscript:
+            if opts.cleanup:
                 cleanupscript(cscript)
             if opts.nofuzz:
                 debug_msg("nofuzz set, will only do first iteration")
