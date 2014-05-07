@@ -16,20 +16,8 @@ import time
 import os
 import sys
 
-####GLOBAL###
-exePath="/usr/lib/libreoffice/program/soffice.bin"
-exeArgs='--impress --norestore'
-#testcasesPath="/mnt/shared/ppt"
-crashesPath=""
-logsPath=""
-fuzzerPath="./radamsa-bin"
-fuzzIter=200
-fuzzDst="fuzzed"
-restoreFlag = False
-debugFlag = True
-processTimeout=20 #seconds
-listfile='filelist.txt'
-logFlag=True
+#import settings
+from settings import *
 
 #XXX: create a fuzzer class and move this kind of stuff inside, settings should have its own file
 logger=None
