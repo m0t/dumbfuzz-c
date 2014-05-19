@@ -113,6 +113,7 @@ def parse_args():
     parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
     parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
     parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
+    parser.add_option("-N", "--noiterate", help="dont iterate generated fuzzed case, pass whole folder", action="store_true", dest=noiterate, default="False")
     parser.add_option("-C", "--cleanup", help="run some script for cleanup after fuzz iteration", dest="cleanup", default=None)
     
     return parser.parse_args()
@@ -174,14 +175,22 @@ def main():
                 empty_fuzzdir(fuzzDst)
                 debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzz_testcase(f, fuzzDst)
-            for file in os.listdir(fuzzDst):            
-                fuzzedcase=fuzzDst + "/" + file
-                debug_msg("run target with file %s" % fuzzedcase)
-                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
-                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+            if opts.noiterate:
+                debug_msg("run target on fuzzed cases folder")
+                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzDst), shell="/usr/bin/python")
+                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzDst), shell="/usr/bin/python")
 
                 gdb_proc.wait()
                 mon_proc.kill()
+            else:
+                for file in os.listdir(fuzzDst):            
+                    fuzzedcase=fuzzDst + "/" + file
+                    debug_msg("run target with file %s" % fuzzedcase)
+                    gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
+                    mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+
+                    gdb_proc.wait()
+                    mon_proc.kill()
             debug_msg('Terminated fuzzing %s' % f)
             if  opts.nofuzz:
                 debug_msg("nofuzz set, will not destroy testcases")
@@ -191,8 +200,6 @@ def main():
                 cleanupscript(cscript)
             if opts.nofuzz:
                 debug_msg("nofuzz set, will only do first iteration")
-            #gdb_proc.kill()
-            #mon_proc.kill()
     except KeyboardInterrupt:
         debug_msg("Ctrl-c detected, exiting")
         try:
