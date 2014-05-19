@@ -113,7 +113,7 @@ def parse_args():
     parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
     parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
     parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
-    parser.add_option("-N", "--noiterate", help="dont iterate generated fuzzed case, pass whole folder", action="store_true", dest="noiterate", default="False")
+    parser.add_option("-N", "--noiterate", help="dont iterate generated fuzzed case, pass whole folder", action="store_true", dest="noiterate", default=False)
     parser.add_option("-C", "--cleanup", help="run some script for cleanup after fuzz iteration", dest="cleanup", default=None)
     
     return parser.parse_args()
