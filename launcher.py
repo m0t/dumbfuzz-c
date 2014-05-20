@@ -10,6 +10,9 @@ try:
 except ValueError:
     sys.path.append(".")
 
+#import additional settings
+from gdbsettings import *
+
 import gdbwrapper
 
 debugFlag = True
@@ -44,7 +47,10 @@ def main():
 
     GDB.execute("set disassembly-flavor intel")
     GDB.execute("handle SIGSEGV stop print nopass")
-
+    
+    for setting in gdbsettings:
+        GDB.execute(setting)
+    
     args = GDB.get_arguments()
     if args == None:
         GDB.debug_msg("No arguments to the executable")
