@@ -1,6 +1,6 @@
 ####GLOBALS###
 exePath="/opt/sophos-av/bin/_/savscan.0"
-exeArgs='-archive -all -suspicious'
+exeArgs='-f -archive -all -suspicious -pua'
 #testcasesPath="/mnt/shared/ppt"
 crashesPath=""
 logsPath=""
