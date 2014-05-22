@@ -15,10 +15,6 @@ from gdbsettings import *
 
 import gdbwrapper
 
-debugFlag = True
-
-#XXX, at some point, move everything in a launcher class
-#GDB=None
 class Launcher(object):
     def __init__(self):
         self.GDB = gdbwrapper.GDBWrapper()
@@ -44,8 +40,6 @@ class Launcher(object):
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
     #
     def save_testcase(self):
-        #global GDB
-        #global logpath
     
         strtime=time.strftime('%d-%m-%y_%H%M')
 

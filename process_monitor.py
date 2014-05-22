@@ -70,9 +70,15 @@ def save_testcase(file):
     global savedir
     check_dir(savedir)
     strtime=time.strftime('%d-%m-%y_%H%M')
-    savefile="fuzzedcase-"+strtime
-    debug_msg('Saving testcase to ' + savefile)
     shutil.copy(file, savedir+'/'+savefile)
+    if os.path.isdir(fuzzedcase):
+        savefile="fuzzedcases-"+strtime
+        debug_msg('passed whole testcases folder, copying everything ')
+        shutil.copytree(fuzzedcase, savedir+savefile)
+    else:
+        savefile="fuzzedcase-"+strtime
+        debug_msg('Saving testcase to ' + savefile)
+        shutil.copy(fuzzedcase, savedir+savefile)
 
 #wait until process is not busy ("define busy?")
 #XXX blocking?
