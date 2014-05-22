@@ -19,64 +19,83 @@ debugFlag = True
 logpath='logs/'
 #XXX, at some point, move everything in a launcher class
 GDB=None
+class Launcher(object):
+    def __init__():
+        GDB = 
+        
+    #XXX not a very good strategy
+    def get_inputfile(args):
+        inputfile = args[0].split(" ")[-1]
+        GDB.debug_msg("input file should be %s" % inputfile)
+        if os.path.isfile(inputfile):
+            return inputfile
+        return False
 
-#XXX not a very good strategy
-def get_inputfile(args):
-    inputfile = args[0].split(" ")[-1]
-    GDB.debug_msg("input file should be %s" % inputfile)
-    if os.path.isfile(inputfile):
-        return inputfile
-    return False
+    def check_logdir(logpath):
+        if not os.path.exists(logpath):
+            GDB.debug_msg("logs dir not found, creating")
+            try:
+                os.mkdir(logpath)
+            except PermissionError:
+                GDB.debug_msg("log dir creation failed, dying")
+                sys.exit(-1)
 
-def check_logdir(logpath):
-    if not os.path.exists(logpath):
-        GDB.debug_msg("logs dir not found, creating")
-        try:
-            os.mkdir(logpath)
-        except PermissionError:
-            GDB.debug_msg("log dir creation failed, dying")
-            sys.exit(-1)
-
-def main():
-    global GDB
-    global logpath
-
-    GDB = gdbwrapper.GDBWrapper()
-
-    check_logdir(logpath)
-
-    GDB.execute("set disassembly-flavor intel")
-    GDB.execute("handle SIGSEGV stop print nopass")
+    #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
+    #
+    def save_testcase():
+        #global GDB
+        global logpath
     
-    for setting in gdbsettings:
-        GDB.execute(setting)
+        if logpath
     
-    args = GDB.get_arguments()
-    if args == None:
-        GDB.debug_msg("No arguments to the executable")
-    else: 
-        GDB.debug_msg("Arguments for exe: %s" % " ".join(args)) #not really but fine 
-
-    GDB.execute('r')
-    state = GDB.get_status()
-    if state != 'STOPPED':
-        #XXX more contextual naming for saved testcase
-        GDB.debug_msg('Crash detected, saving crashdump and testcase')
-        GDB.write_crashdump('fuzzlog', logpath, echo=True)
         strtime=time.strftime('%d-%m-%y_%H%M')
         savefile="fuzzedcase-"+strtime
-        GDB.debug_msg('Saving testcase to ' + savefile)
+        self.GDB.debug_msg('Saving testcase to ' + savefile)
         fuzzedcase = get_inputfile(args)
         if fuzzedcase:
             shutil.copy(fuzzedcase, logpath+savefile)
         else:
             GDB.debug_msg("fuzzed case not found?")
+    
+    def run():
+
+        self.GDB = gdbwrapper.GDBWrapper()
+
+        check_logdir(logpath)
+
+        GDB.execute("set disassembly-flavor intel")
+        GDB.execute("handle SIGSEGV stop print nopass")
+    
+        for setting in gdbsettings:
+            GDB.execute(setting)
+    
+        args = GDB.get_arguments()
+        if args == None:
+            GDB.debug_msg("No arguments to the executable")
+        else: 
+            GDB.debug_msg("Arguments for exe: %s" % " ".join(args)) #not really but fine 
+
+        GDB.execute('r')
+        state = GDB.get_status()
+        if state != 'STOPPED':
+            #XXX more contextual naming for saved testcase
+            GDB.debug_msg('Crash detected, saving crashdump and testcase')
+            GDB.write_crashdump('fuzzlog', logpath, echo=True)
         
-        #XXX second chance testing?
-        GDB.execute('kill')
-        sys.exit(1)
-    else:
-        GDB.debug_msg("Process terminated normally")
-        sys.exit(0)
+            strtime=time.strftime('%d-%m-%y_%H%M')
+            savefile="fuzzedcase-"+strtime
+            GDB.debug_msg('Saving testcase to ' + savefile)
+            fuzzedcase = get_inputfile(args)
+            if fuzzedcase:
+                shutil.copy(fuzzedcase, logpath+savefile)
+            else:
+                GDB.debug_msg("fuzzed case not found?")
+        
+            #XXX second chance testing?
+            GDB.execute('kill')
+            sys.exit(1)
+        else:
+            GDB.debug_msg("Process terminated normally")
+            sys.exit(0)
 
 main()
