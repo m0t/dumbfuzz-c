@@ -58,7 +58,7 @@ class Launcher(object):
     
     def run(self):
 
-        check_logdir(self.logpath)
+        self.check_logdir(self.logpath)
         GDB=self.GDB
         GDB.execute("set disassembly-flavor intel")
         GDB.execute("handle SIGSEGV stop print nopass")
@@ -82,7 +82,7 @@ class Launcher(object):
             strtime=time.strftime('%d-%m-%y_%H%M')
             savefile="fuzzedcase-"+strtime
             GDB.debug_msg('Saving testcase to ' + savefile)
-            fuzzedcase = get_inputfile(args)
+            fuzzedcase = self.get_inputfile(args)
             if fuzzedcase:
                 shutil.copy(fuzzedcase, self.logpath+savefile)
             else:
