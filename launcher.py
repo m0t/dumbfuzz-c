@@ -39,7 +39,7 @@ class Launcher(object):
 
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
     #
-    def save_testcase(self):
+    def save_testcase(self,args):
     
         strtime=time.strftime('%d-%m-%y_%H%M')
 
@@ -79,7 +79,8 @@ class Launcher(object):
             GDB.debug_msg('Crash detected, saving crashdump and testcase')
             GDB.write_crashdump('fuzzlog', self.logpath, echo=True)
         
-            self.save_testcase()
+            #XXX extracting input file from args it's horrible
+            self.save_testcase(args)
         
             #XXX second chance testing?
             GDB.execute('kill')
