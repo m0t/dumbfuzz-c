@@ -66,11 +66,11 @@ def check_dir(dir):
             debug_msg("saved dir creation failed, dying")
             sys.exit(-1)
 
-def save_testcase(file):
+def save_testcase(casefile):
     global savedir
     check_dir(savedir)
     strtime=time.strftime('%d-%m-%y_%H%M')
-    if os.path.isdir(fuzzedcase):
+    if os.path.isdir(casefile):
         savefile="fuzzedcases-"+strtime
         debug_msg('passed whole testcases folder, copying everything ')
         shutil.copytree(fuzzedcase, savedir+savefile)
