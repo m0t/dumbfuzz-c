@@ -43,7 +43,7 @@ class Launcher(object):
     
         strtime=time.strftime('%d-%m-%y_%H%M')
 
-        fuzzedcase = get_inputfile(args)
+        fuzzedcase = self.get_inputfile(args)
         if fuzzedcase:
             if os.path.isdir(fuzzedcase):
                 savefile="fuzzedcases-"+strtime
