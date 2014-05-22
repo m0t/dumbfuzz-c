@@ -58,7 +58,7 @@ class Launcher(object):
     
     def run(self):
 
-        self.check_logdir(self.logpath)
+        self.check_logdir()
         GDB=self.GDB
         GDB.execute("set disassembly-flavor intel")
         GDB.execute("handle SIGSEGV stop print nopass")
