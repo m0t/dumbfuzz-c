@@ -24,7 +24,7 @@ class Launcher(object):
     def get_inputfile(self,args):
         inputfile = args[0].split(" ")[-1]
         self.GDB.debug_msg("input file should be %s" % inputfile)
-        if os.path.isfile(inputfile):
+        if os.path.isfile(inputfile) or os.path.isdir(inputfile):
             return inputfile
         return False
 
