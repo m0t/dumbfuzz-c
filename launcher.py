@@ -79,14 +79,7 @@ class Launcher(object):
             GDB.debug_msg('Crash detected, saving crashdump and testcase')
             GDB.write_crashdump('fuzzlog', self.logpath, echo=True)
         
-            strtime=time.strftime('%d-%m-%y_%H%M')
-            savefile="fuzzedcase-"+strtime
-            GDB.debug_msg('Saving testcase to ' + savefile)
-            fuzzedcase = self.get_inputfile(args)
-            if fuzzedcase:
-                shutil.copy(fuzzedcase, self.logpath+savefile)
-            else:
-                GDB.debug_msg("fuzzed case not found?")
+            self.save_testcase()
         
             #XXX second chance testing?
             GDB.execute('kill')
