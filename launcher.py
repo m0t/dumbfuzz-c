@@ -20,19 +20,19 @@ debugFlag = True
 #XXX, at some point, move everything in a launcher class
 #GDB=None
 class Launcher(object):
-    def __init__():
+    def __init__(self):
         self.GDB = gdbwrapper.GDBWrapper()
         self.logpath='logs/'
         
     #XXX not a very good strategy
-    def get_inputfile(args):
+    def get_inputfile(self,args):
         inputfile = args[0].split(" ")[-1]
         self.GDB.debug_msg("input file should be %s" % inputfile)
         if os.path.isfile(inputfile):
             return inputfile
         return False
 
-    def check_logdir():
+    def check_logdir(self):
         if not os.path.exists(self.logpath):
             self.GDB.debug_msg("logs dir not found, creating")
             try:
@@ -43,7 +43,7 @@ class Launcher(object):
 
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
     #
-    def save_testcase():
+    def save_testcase(self):
         #global GDB
         #global logpath
     
@@ -56,7 +56,7 @@ class Launcher(object):
         else:
             self.GDB.debug_msg("fuzzed case not found?")
     
-    def run():
+    def run(self):
 
         check_logdir(self.logpath)
         GDB=self.GDB
