@@ -73,11 +73,11 @@ def save_testcase(casefile):
     if os.path.isdir(casefile):
         savefile="fuzzedcases-"+strtime
         debug_msg('passed whole testcases folder, copying everything ')
-        shutil.copytree(fuzzedcase, savedir+savefile)
+        shutil.copytree(casefile, savedir+savefile)
     else:
         savefile="fuzzedcase-"+strtime
         debug_msg('Saving testcase to ' + savefile)
-        shutil.copy(fuzzedcase, savedir+savefile)
+        shutil.copy(casefile, savedir+savefile)
 
 #wait until process is not busy ("define busy?")
 #XXX blocking?
