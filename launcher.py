@@ -48,11 +48,17 @@ class Launcher(object):
         #global logpath
     
         strtime=time.strftime('%d-%m-%y_%H%M')
-        savefile="fuzzedcase-"+strtime
-        self.GDB.debug_msg('Saving testcase to ' + savefile)
+
         fuzzedcase = get_inputfile(args)
         if fuzzedcase:
-            shutil.copy(fuzzedcase, self.logpath+savefile)
+            if os.path.isdir(fuzzedcase):
+                savefile="fuzzedcases-"+strtime
+                self.GDB.debug_msg('passed whole testcases folder, copying everything ')
+                shutil.copytree(fuzzedcase, self.logpath+savefile)
+            else:
+                savefile="fuzzedcase-"+strtime
+                self.GDB.debug_msg('Saving testcase to ' + savefile)
+                shutil.copy(fuzzedcase, self.logpath+savefile)
         else:
             self.GDB.debug_msg("fuzzed case not found?")
     
