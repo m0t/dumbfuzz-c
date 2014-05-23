@@ -75,20 +75,20 @@ class ProcMon(object):
         time.sleep(self.processTimeout)
         self.timeout.set()
     
-    def getSigma2(l, mean):
+    def getSigma2(self, l, mean):
         s2=[]
         for i in l:
             s2.append(i*i)
         return (sum(s2)/len(s2))-(mean*mean)
     
     #run in his own thread, occasionally read pipe, if anything was written verify with stored data
-    def monitor_listener():
-        global pipename
+    def monitor_listener(self):
         return
 
     #immediately kill and exit
-    def kill_proc_and_exit(p):
-        p.kill()
+    def kill_proc_and_exit(self):
+        #XXX
+        self.process.proc.kill()
         debug_msg("exiting")
         sys.exit(0)
         
