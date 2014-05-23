@@ -8,27 +8,6 @@ import sys
 
 from procmon import *
 
-
-debugFlag=True
-processTimeout=20 #seconds
-savedir="saved" #where to save testcase if interesting but not catched by debugger
-pipename="/tmp/monitor_pipe0"
-
-def debug_msg(msg):
-    global debugFlag
-    if debugFlag:
-        #well, really a best effort thing
-        try:
-            sys.stdout.write('[MONITOR] ' + msg + '\n')
-        except:
-            pass 
-    return
-    
-def die(msg):
-    sys.stderr.write("MONITOR ERROR" + msg + "\n")
-    sys.exit(-1)
-
-
 def check_psutil():
     if psutil.version_info[0] == 2:
         return True
