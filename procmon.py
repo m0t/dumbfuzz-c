@@ -88,7 +88,7 @@ class ProcMon(object):
         sys.exit(0)
         
     def start(self):
-        debug_msg("starting search for process %s with args \"%s\"" % (exeFile, exeArgs))
+        debug_msg("starting search for process %s with args \"%s\"" % (self.exeFile, self.exeArgs))
 
         self.process.init()
 
