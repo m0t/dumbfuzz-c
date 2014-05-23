@@ -61,13 +61,12 @@ class ProcMon(object):
     processTimeout=20
     timeout=None
     pipe_event=None
-    timer=None
     listener=None
     process=None
     
     def __init__(self, exeFile, exeArgs):
-        timeout=threading.Event()
-        pipe_event=threading.Event()
+        self.timeout=threading.Event()
+        self.pipe_event=threading.Event()
         self.exeFile = exeFile
         self.exeArgs = exeArgs
         self.process = Process(self.exeFile, self.exeArgs)
