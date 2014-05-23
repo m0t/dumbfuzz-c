@@ -48,7 +48,7 @@ class Process(object):
                 debug_msg("process not found, keep searching")
             time.sleep(self.searchInterval)
     
-    #a good example of proxy that is never used
+    #we should use more this kind of stuff
     def get_pid(self):
         return self.proc.pid
 
@@ -98,7 +98,7 @@ class ProcMon(object):
 
         self.process.init()
 
-        debug_msg("pid found: %d ; starting timer thread" % p.pid)
+        debug_msg("pid found: %d ; starting timer thread" % self.process.get_pid())
 
         self.timer = threading.Thread(target=self.timer_thread)
 
