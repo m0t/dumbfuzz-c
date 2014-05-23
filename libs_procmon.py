@@ -1,3 +1,5 @@
+import sys
+
 def debug_msg(msg):
     #global debugFlag
     #if debugFlag:
