@@ -47,6 +47,10 @@ class Process(object):
             if pids == None:
                 debug_msg("process not found, keep searching")
             time.sleep(self.searchInterval)
+            
+    #TODO: pid has changed, class must be reinitialized with actual process data
+    def update(self, newpid):
+        return
     
     #we should use more this kind of stuff
     def get_pid(self):
@@ -59,6 +63,7 @@ class ProcMon(object):
     debugFlag=True
     save_arg=True #will affect decision to save or not long running testcases
     processTimeout=20
+    readInterval=0.5    #seconds , inteval to check pipe
     timeout=None
     pipe_event=None
     listener=None
@@ -81,14 +86,47 @@ class ProcMon(object):
             s2.append(i*i)
         return (sum(s2)/len(s2))-(mean*mean)
     
+    def check_pid(self, newPid):
+        if self.process.get_pid() != newPid:
+            self.process.update(newPid)
+            self.pipe_event.set()            
+    
+    def parse_message(self, buf):
+        lines=buf.split("\n")
+        for line in lines:
+            msg=line.split(":")
+            if msg[0] == 'PID':
+                self.check_pid(msg[1])
+    
     #run in his own thread, occasionally read pipe, if anything was written verify with stored data
     def monitor_listener(self):
-        return
+        try:
+            os.mkfifo(self.pipename)
+        except:
+            debug_msg("pipe was not created")
+        try:
+            pipe=os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
+        except:
+            die("unable to open pipe")
+        try:
+            buf = os.read(pipe, 100)
+        if buf != 0:
+            self.parse_message(buf)
+        time.sleep(self.readInterval)
+        
+
+    def destroy_pipe(self):
+        #try to remove pipe
+        try:
+            os.unlink(self.pipename) #XXX do we have to close the thread?
+        except:
+            pass
 
     #immediately kill and exit
     def kill_proc_and_exit(self):
         #XXX
         self.process.proc.kill()
+        self.destroy_pipe() 
         debug_msg("exiting")
         sys.exit(0)
         
@@ -100,6 +138,7 @@ class ProcMon(object):
         debug_msg("pid found: %d ; starting timer thread" % self.process.get_pid())
 
         self.timer = threading.Thread(target=self.timer_thread)
+        self.listener = threading.Thread(target=self.monitor_listener)
 
         self.timer.start()
 
@@ -139,6 +178,9 @@ class ProcMon(object):
         
         timecounter = 0
         while not self.timeout.is_set():
+            if self.pipe_event.is_set():
+                #TODO: something is happened, pid changed, adapt
+                pass
             try:
             
                 cpu=[]
@@ -161,6 +203,7 @@ class ProcMon(object):
                         self.save_testcase()
             except psutil.NoSuchProcess:
                 debug_msg("Checker lost the process")
+                self.destroy_pipe()
                 return
         debug_msg("timeout reached, killing the process and dying")
         if self.save_arg:
