@@ -1,11 +1,11 @@
 def debug_msg(msg):
-    global debugFlag
-    if debugFlag:
+    #global debugFlag
+    #if debugFlag:
         #well, really a best effort thing
-        try:
-            sys.stdout.write('[MONITOR] ' + msg + '\n')
-        except:
-            pass 
+    try:
+        sys.stdout.write('[MONITOR] ' + msg + '\n')
+    except:
+        pass 
     return
     
 def die(msg):
