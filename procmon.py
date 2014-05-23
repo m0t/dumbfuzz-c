@@ -28,7 +28,7 @@ class Process(object):
     #actually populate class finding the pid, will be blocked until is found
     def init(self):
         while True:
-            pids = find_proc()
+            pids = self.find_proc()
             #actually better catch this, even if still early
             if pids != None:
                 if len(pids) > 1:
