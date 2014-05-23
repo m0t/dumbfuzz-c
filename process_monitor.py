@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import threading
 import psutil
 import time
 import os
