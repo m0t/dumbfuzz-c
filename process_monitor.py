@@ -1,11 +1,5 @@
 #!/usr/bin/python3
 
-import psutil
-import time
-import os
-import shutil
-import sys
-
 from procmon import *
 
 def check_psutil():
