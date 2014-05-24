@@ -4,6 +4,7 @@
 
 import time
 import gdb
+import re
 from utils import *
 
 REGISTERS = {
@@ -73,6 +74,11 @@ class GDBWrapper(object):
             logfd.close()
             raise e
         return result.decode('ascii')
+    
+    #TODO
+    def run(self):
+        return
+        
     
     def getarch(self):
         """
@@ -172,6 +178,20 @@ class GDBWrapper(object):
         except:
             raise
         return True
+    
+    #if catch fork was set we can detect if we are about to follow fork, false if we are not following
+    def detect_fork(self):
+        out=self.execute_redirect("show follow-fork-mode")
+        if "parent" in out:
+            return False
+        else:
+            currPid=self.getpid()
+            out=self.execute_redirect("i b")
+            search = re.findall( "fork, process (\d+)", out )
+            if len(search)>0:
+                return search[0]
+            else:
+                return False
     
     def get_arguments(self):
         out = self.execute_redirect("show args")

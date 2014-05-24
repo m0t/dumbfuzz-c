@@ -1,3 +1,4 @@
 gdbsettings=[
-    "set follow-fork-mode child"
+    "set follow-fork-mode child",
+    "catch fork"
 ]

@@ -50,7 +50,15 @@ class Process(object):
             
     #TODO: pid has changed, class must be reinitialized with actual process data
     def update(self, newpid):
-        return
+        try:
+            self.proc=psutil.Process(newpid)
+            #keep original name and args, we don't know what the target might execute, we just want to monitor the right pid
+            #self.name=self.proc.cmdline()[0]
+            #self.args=" ".join(self.proc.cmdline()[1:])
+        except psutil.NoSuchProces:
+            debug_msg("trying to switch to a non existent pid")
+            return False
+        return True
     
     #we should use more this kind of stuff
     def get_pid(self):
@@ -75,7 +83,8 @@ class ProcMon(object):
         self.exeFile = exeFile
         self.exeArgs = exeArgs
         self.process = Process(self.exeFile, self.exeArgs)
-        
+     
+    #XXX apparently timers are natively implemented in python, you should try that   
     def timer_thread(self):
         time.sleep(self.processTimeout)
         self.timeout.set()
@@ -88,8 +97,9 @@ class ProcMon(object):
     
     def check_pid(self, newPid):
         if self.process.get_pid() != newPid:
-            self.process.update(newPid)
-            self.pipe_event.set()            
+            debug_msg("target PID changed to %d, updating" % newPid)
+            if self.process.update(newPid):
+                self.pipe_event.set()        
     
     def parse_message(self, buf):
         lines=buf.split("\n")
@@ -180,7 +190,9 @@ class ProcMon(object):
         while not self.timeout.is_set():
             if self.pipe_event.is_set():
                 #TODO: something is happened, pid changed, adapt
-                pass
+                #XXX this shouldn't be needed
+                p=self.process.proc
+                debug_msg("watching now PID %d" % self.process.get_pid())
             try:
             
                 cpu=[]
