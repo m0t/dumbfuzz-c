@@ -67,10 +67,14 @@ class Launcher(object):
         try:
             #currently only one type of msg
             mesg=("PID:%s" % msg).encode('ascii')
-            return os.write(pipe,mesg)
+            self.GDB.debug_msg("message: " % mesg)
+            result = os.write(pipe,mesg)
+            os.close(pipe)
+            return result
         except:
             self.GDB.debug_msg("pipe open, but couldn't write")
             #no point in doing anything
+            os.close(pipe)
             return False
     
     def run(self):
