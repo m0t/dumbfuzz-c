@@ -116,16 +116,18 @@ class ProcMon(object):
             debug_msg("pipe was not created")
         try:
             pipe=os.open(self.pipename, os.O_RDONLY | os.O_NONBLOCK)
+            debug_msg("Listener opened pipe")
         except:
             die("unable to open pipe")
-        try:
-            buf = os.read(pipe, 100)
-        except:
-            debug_msg("pipe read error")
-            raise
-        if len(buf) != 0:
-            self.parse_message(buf.decode('ascii'))
-        time.sleep(self.readInterval)
+        while True:
+            try:
+                buf = os.read(pipe, 100)
+            except:
+                debug_msg("pipe read error")
+                raise
+            if len(buf) != 0:
+                self.parse_message(buf.decode('ascii'))
+            time.sleep(self.readInterval)
         
 
     def destroy_pipe(self):

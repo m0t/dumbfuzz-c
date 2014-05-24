@@ -59,11 +59,18 @@ class Launcher(object):
             self.GDB.debug_msg("fuzzed case not found?")
     
     def pipe_send_message(self, msg):
-        try:
-            pipe=os.open(self.pipename, os.O_WRONLY|os.O_NONBLOCK)
-        except:
-            self.GDB.debug_msg("can't open pipe, probably not ready")
-            return False
+        retries=0
+        while True:
+            try:
+                pipe=os.open(self.pipename, os.O_WRONLY|os.O_NONBLOCK)
+                break
+            except:
+                self.GDB.debug_msg("can't open pipe, probably not ready")
+                retries+=1
+                if retries==2:
+                    return False
+                time.sleep(0.1)
+                continue
         try:
             #currently only one type of msg
             mesg=("PID:%d" % msg).encode('ascii')
