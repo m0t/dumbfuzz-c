@@ -9,6 +9,6 @@ fuzzIter=200
 fuzzDst="fuzzed"
 restoreFlag = False
 debugFlag = True
-processTimeout=20 #seconds
+processTimeout=30 #seconds
 listfile='filelist.txt'
 logFlag=True

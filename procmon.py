@@ -69,7 +69,7 @@ class ProcMon(object):
     pipename="/tmp/monitor_pipe0"
     savedir="saved"
     debugFlag=True
-    save_arg=True #will affect decision to save or not long running testcases
+    save_arg=False #will affect decision to save or not long running testcases
     processTimeout=20
     readInterval=0.5    #seconds , inteval to check pipe
     timeout=None
