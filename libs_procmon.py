@@ -11,5 +11,5 @@ def debug_msg(msg):
     return
     
 def die(msg):
-    sys.stderr.write("MONITOR ERROR" + msg + "\n")
+    sys.stderr.write("[ MONITOR ERROR ] " + msg + "\n")
     sys.exit(-1)

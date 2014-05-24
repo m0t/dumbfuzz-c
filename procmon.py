@@ -115,7 +115,7 @@ class ProcMon(object):
         except:
             debug_msg("pipe was not created")
         try:
-            pipe=os.open(pipename, os.O_RDONLY | os.O_NONBLOCK)
+            pipe=os.open(self.pipename, os.O_RDONLY | os.O_NONBLOCK)
         except:
             die("unable to open pipe")
         try:
