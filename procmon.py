@@ -154,6 +154,7 @@ class ProcMon(object):
         self.listener = threading.Thread(target=self.monitor_listener)
 
         self.timer.start()
+        self.listener.start()
 
         self.wait_for_proc()  
 
