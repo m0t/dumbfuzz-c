@@ -120,6 +120,9 @@ class ProcMon(object):
             die("unable to open pipe")
         try:
             buf = os.read(pipe, 100)
+        except:
+            die("pipe read error")
+            raise
         if buf != 0:
             self.parse_message(buf)
         time.sleep(self.readInterval)
