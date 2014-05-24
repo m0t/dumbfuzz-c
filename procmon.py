@@ -121,7 +121,7 @@ class ProcMon(object):
         try:
             buf = os.read(pipe, 100)
         except:
-            die("pipe read error")
+            debug_msg("pipe read error")
             raise
         if len(buf) != 0:
             self.parse_message(buf.decode('ascii'))
