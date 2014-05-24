@@ -58,7 +58,7 @@ class Launcher(object):
         else:
             self.GDB.debug_msg("fuzzed case not found?")
     
-    def pipe_send_message(msg):
+    def pipe_send_message(self, msg):
         try:
             pipe=os.open(self.pipename, os.O_WRONLY|os.O_NONBLOCK)
         except:
