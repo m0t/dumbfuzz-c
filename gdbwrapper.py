@@ -188,8 +188,8 @@ class GDBWrapper(object):
             currPid=self.getpid()
             out=self.execute_redirect("i b")
             search = re.findall( "fork, process (\d+)", out )
-            if len(search)>0:
-                return search[0]
+            if len(search)>0 and currPid != int(search[0]):
+                return int(search[0])
             else:
                 return False
     

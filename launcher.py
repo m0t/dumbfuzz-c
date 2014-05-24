@@ -66,7 +66,7 @@ class Launcher(object):
             return False
         try:
             #currently only one type of msg
-            mesg=("PID:%s" % msg).encode('ascii')
+            mesg=("PID:%d" % msg).encode('ascii')
             self.GDB.debug_msg("message: " % mesg)
             result = os.write(pipe,mesg)
             os.close(pipe)
@@ -99,6 +99,7 @@ class Launcher(object):
             if state == 'BREAKPOINT':
                 newPid = GDB.detect_fork()
                 if newPid != False:
+                    GDB.debug_msg("detected fork to pid %d" % newPid)
                     self.pipe_send_message(newPid)
                 GDB.execute('c')
             else:
