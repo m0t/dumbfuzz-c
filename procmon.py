@@ -102,7 +102,7 @@ class ProcMon(object):
                 self.pipe_event.set()        
     
     def parse_message(self, buf):
-        lines=buf.split("\n")
+        lines=buf.splitlines()
         for line in lines:
             msg=line.split(":")
             if msg[0] == 'PID':
@@ -123,8 +123,8 @@ class ProcMon(object):
         except:
             die("pipe read error")
             raise
-        if buf != 0:
-            self.parse_message(buf)
+        if len(buf) != 0:
+            self.parse_message(buf.decode('ascii'))
         time.sleep(self.readInterval)
         
 
