@@ -106,7 +106,7 @@ class ProcMon(object):
         for line in lines:
             msg=line.split(":")
             if msg[0] == 'PID':
-                self.check_pid(msg[1])
+                self.check_pid(int(msg[1]))
     
     #run in his own thread, occasionally read pipe, if anything was written verify with stored data
     def monitor_listener(self):
