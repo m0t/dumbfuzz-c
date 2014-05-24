@@ -169,8 +169,9 @@ class ProcMon(object):
                 debug_msg("saved dir creation failed, dying")
                 sys.exit(-1)
 
-    def save_testcase(self, casefile):
+    def save_testcase(self):
         self.check_dir()
+        casefile=self.exeArgs
         strtime=time.strftime('%d-%m-%y_%H%M')
         if os.path.isdir(casefile):
             savefile="fuzzedcases-"+strtime
@@ -227,7 +228,7 @@ class ProcMon(object):
         debug_msg("timeout reached, killing the process and dying")
         if self.save_arg:
             debug_msg("Interesting file found, saving testcase")
-            self.save_testcase(proc_arg)
+            self.save_testcase()
         self.kill_proc_and_exit()
         
         
