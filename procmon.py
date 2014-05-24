@@ -199,6 +199,7 @@ class ProcMon(object):
                 #XXX this shouldn't be needed
                 p=self.process.proc
                 debug_msg("watching now PID %d" % self.process.get_pid())
+                self.pipe_event.clear()
             try:
             
                 cpu=[]
