@@ -166,8 +166,8 @@ class GDBWrapper(object):
         strtime=time.strftime('%d-%m-%y_%H%M')
         try:
             crashfile=open(path+prefix+"_"+strtime+'.txt', 'w')
-            #XXX out = self.get_programcontext()
-            out=self.get_regs()
+            out = self.get_programcontext()
+            out+=self.get_regs()
             out+=self.get_callstack()
             out+=self.get_codecontext()
             out+=self.get_stackcontext()
