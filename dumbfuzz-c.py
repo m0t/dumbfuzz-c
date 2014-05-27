@@ -173,7 +173,7 @@ def main():
             start=int(opts.skipto)
         for i in range(start,len(filelist)):
             f = filelist[i]
-            if not opts.nofuzz or not opts.runonly:
+            if not opts.nofuzz and not opts.runonly:
                 empty_fuzzdir(fuzzDst)
                 debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzz_testcase(f, fuzzDst)
