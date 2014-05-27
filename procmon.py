@@ -80,6 +80,7 @@ class ProcMon(object):
     def __init__(self, exeFile, exeArgs):
         self.timeout=threading.Event()
         self.pipe_event=threading.Event()
+        self.listener_death_signal=threading.Event()
         self.exeFile = exeFile
         self.exeArgs = exeArgs
         self.process = Process(self.exeFile, self.exeArgs)
@@ -119,7 +120,7 @@ class ProcMon(object):
             debug_msg("Listener opened pipe")
         except:
             die("unable to open pipe")
-        while True:
+        while not self.listener_death_signal.is_set():
             try:
                 buf = os.read(pipe, 100)
             except:
@@ -128,22 +129,34 @@ class ProcMon(object):
             if len(buf) != 0:
                 self.parse_message(buf.decode('ascii'))
             time.sleep(self.readInterval)
-        
+        try:
+            os.close(self.pipename)
+            os.unlink(self.pipename)
+        except:
+            pass
 
     def destroy_pipe(self):
-        #try to remove pipe
+        #try to close listener in the cool way
+        self.listener_death_signal.set()
+        self.listener.join()
+        '''
         try:
+            os.close(self.pipename)
             os.unlink(self.pipename) #XXX do we have to close the thread?
         except:
             pass
+        '''
+        
+    def cleanup_and_exit(self, retvalue):
+        self.destroy_pipe()
+        debug_msg("exiting")
+        sys.exit(retvalue)
 
     #immediately kill and exit
     def kill_proc_and_exit(self):
         #XXX
         self.process.proc.kill()
-        self.destroy_pipe() 
-        debug_msg("exiting")
-        sys.exit(0)
+        self.cleanup_and_exit(0)
         
     def start(self):
         debug_msg("starting search for process %s with args \"%s\"" % (self.exeFile, self.exeArgs))
@@ -167,7 +180,7 @@ class ProcMon(object):
                 os.mkdir(self.savedir)
             except PermissionError:
                 debug_msg("saved dir creation failed, dying")
-                sys.exit(-1)
+                self.cleanup_and_exit(-1)
 
     def save_testcase(self):
         self.check_dir()

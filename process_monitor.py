@@ -20,7 +20,11 @@ def main():
     exeFile=sys.argv[1]
     exeArgs=sys.argv[2]
     
-    procmon=ProcMon(exeFile,exeArgs)
-    procmon.start()
-
+    try:
+        procmon=ProcMon(exeFile,exeArgs)
+        procmon.start()
+    except KeyboardInterrupt:
+        debug_msg("ctrl-c detected, killing")
+        procmon.cleanup_and_exit(-1)
+   
 main()
