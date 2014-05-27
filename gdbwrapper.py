@@ -129,7 +129,11 @@ class GDBWrapper(object):
         return self.execute_redirect("i reg")
     
     def get_callstack(self):
-        return self.execute_redirect("i stack")
+        try:
+            out = self.execute_redirect("i stack")
+        except gdb.MemoryError:
+            out = "can't access stack context\n"
+        return out
     
     def get_programcontext(self):
         return self.execute_redirect("i file")
