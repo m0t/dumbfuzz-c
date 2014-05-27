@@ -12,6 +12,7 @@ import subprocess
 import optparse
 import threading
 import psutil
+import shutil
 import time
 import os
 import sys
@@ -108,13 +109,14 @@ def parse_args():
     parser = optparse.OptionParser("%prog [some opts] [-L filelist]|[-D fuzzdir]")
     parser.add_option("-v", "--debug", help="get debug output", action="store_true", dest="debug", default=True)
     parser.add_option("-s", "--export", help="save filelist.txt ", action="store_true", dest="saveList", default=False)
-    parser.add_option("-t", "--nofuzz", help="start fuzzer, dont generate testcases, for TESTING", action="store_true", dest="nofuzz", default=False)
-    parser.add_option("-T", "--test", help="don't start fuzzer, for TESTING", action="store_true", dest="testrun", default=False)
+    parser.add_option("-R", "--runonly", help="don't fuzz, run program on test files directly", action="store_true", dest="runonly", default=False)
     parser.add_option("-S", "--skipto", help="skip to #n iteration", dest="skipto", default=None)
     parser.add_option("-L", "--list", help="read filelist from file", dest="filelist", default=None)
     parser.add_option("-D", "--fuzzdir", help="create filelist from dir", dest="fuzzdir", default=None)
     parser.add_option("-N", "--noiterate", help="don't iterate generated fuzzed cases, pass whole folder", action="store_true", dest="noiterate", default=False)
     parser.add_option("-C", "--cleanup", help="run some script to cleanup after fuzz iteration", dest="cleanup", default=None)
+    parser.add_option("-t", "--nofuzz", help="start fuzzer, dont generate testcases, for TESTING", action="store_true", dest="nofuzz", default=False)
+    parser.add_option("-T", "--test", help="don't start fuzzer, for TESTING", action="store_true", dest="testrun", default=False)
     
     return parser.parse_args()
 
@@ -179,6 +181,16 @@ def main():
                 debug_msg("run target on fuzzed cases folder")
                 gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzDst), shell="/usr/bin/python")
                 mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzDst), shell="/usr/bin/python")
+
+                gdb_proc.wait()
+                mon_proc.kill()
+            elif opts.runonly:
+                debug_msg("run-only mode, will copy the file and run target directly on %s", f)
+                empty_fuzzdir(fuzzDst)
+                fuzzedcase=fuzzDst + "/" + os.path.basename(f)
+                shutil.copy(f, fuzzedcase)
+                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
+                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
 
                 gdb_proc.wait()
                 mon_proc.kill()
