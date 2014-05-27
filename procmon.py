@@ -235,8 +235,7 @@ class ProcMon(object):
                         self.save_testcase()
             except psutil.NoSuchProcess:
                 debug_msg("Checker lost the process")
-                self.destroy_pipe()
-                return
+                cleanup_and_exit(0)
         debug_msg("timeout reached, killing the process and dying")
         if self.save_arg:
             debug_msg("Interesting file found, saving testcase")
