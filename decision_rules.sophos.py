@@ -17,7 +17,7 @@ if timecounter > 5:
         weight += 0.1
     elif sigma2 <= 100 and mean > 40:
         weight += 0.05
-        if votes >= self.quorum and self.save_arg==True:
+        if self.votes >= self.quorum and self.save_arg==True:
             self.save_votes=1
     elif sigma2 > 200:
         weight -= 0.2
