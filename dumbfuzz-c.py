@@ -173,7 +173,7 @@ def main():
             start=int(opts.skipto)
         for i in range(start,len(filelist)):
             f = filelist[i]
-            if not opts.nofuzz:
+            if not opts.nofuzz or opts.runonly:
                 empty_fuzzdir(fuzzDst)
                 debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzz_testcase(f, fuzzDst)
@@ -185,7 +185,7 @@ def main():
                 gdb_proc.wait()
                 mon_proc.kill()
             elif opts.runonly:
-                debug_msg("run-only mode, will copy the file and run target directly on %s", f)
+                debug_msg("run-only mode, will copy the file and run target directly on %s" % f)
                 empty_fuzzdir(fuzzDst)
                 fuzzedcase=fuzzDst + "/" + os.path.basename(f)
                 shutil.copy(f, fuzzedcase)
