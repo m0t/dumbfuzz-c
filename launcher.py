@@ -108,7 +108,11 @@ class Launcher(object):
                 if newPid != False:
                     GDB.debug_msg("detected fork to pid %d" % newPid)
                     self.pipe_send_message(newPid)
-                GDB.execute('c')
+                try:
+                    GDB.execute('c')
+                except:
+                    GDB.debug_msg("something went wrong trying to continue the process")
+                    break
             else:
                 break
         if state == 'STOPPED':
