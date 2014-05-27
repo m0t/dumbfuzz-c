@@ -132,7 +132,7 @@ class GDBWrapper(object):
         try:
             out = self.execute_redirect("i stack")
         except gdb.MemoryError:
-            out = "can't access stack context\n"
+            out = "can't access call stack context\n"
         return out
     
     def get_programcontext(self):
