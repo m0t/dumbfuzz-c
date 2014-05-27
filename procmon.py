@@ -130,7 +130,7 @@ class ProcMon(object):
                 self.parse_message(buf.decode('ascii'))
             time.sleep(self.readInterval)
         try:
-            os.close(self.pipename)
+            os.close(pipe)
             os.unlink(self.pipename)
         except:
             pass
@@ -209,7 +209,6 @@ class ProcMon(object):
         timecounter = 0
         while not self.timeout.is_set():
             if self.pipe_event.is_set():
-                #TODO: something is happened, pid changed, adapt
                 #XXX this shouldn't be needed
                 p=self.process.proc
                 debug_msg("watching now PID %d" % self.process.get_pid())
