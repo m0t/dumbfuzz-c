@@ -189,11 +189,11 @@ class ProcMon(object):
         if os.path.isdir(casefile):
             savefile="fuzzedcases-"+strtime
             debug_msg('passed whole testcases folder, copying everything ')
-            shutil.copytree(casefile, self.savedir+savefile)
+            shutil.copytree(casefile, self.savedir+'/'+savefile)
         else:
             savefile="fuzzedcase-"+strtime
             debug_msg('Saving testcase to ' + savefile)
-            shutil.copy(casefile, self.savedir+savefile)
+            shutil.copy(casefile, self.savedir+'/'+savefile)
 
     #wait until process is not busy (for definition of busy, see decider.py)
     def wait_for_proc(self):
