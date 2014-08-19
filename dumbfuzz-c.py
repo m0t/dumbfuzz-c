@@ -56,6 +56,9 @@ def debug_msg(msg):
 def quotestring(s):
     return "\\'".join("'" + p + "'" for p in s.split("'"))
 
+def get_ext(filename):
+    return os.path.splitext(filename)[1]
+
 def setup_logger():
     global logger
     logger = l.getLogger("errorlog")
@@ -84,11 +87,12 @@ def fuzz_testcase(testcase, fuzzDst):
     if not os.path.exists(fuzzDst):
         debug_msg("creating dir %s\n" % (fuzzDst))
         os.mkdir(fuzzDst)
+    ext=get_ext(testcase)
     if debugFlag:
-        fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, quotestring(testcase))
+        fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n%s %s" % (fuzzerPath, fuzzIter, fuzzDst, ext, quotestring(testcase))
         debug_msg(fuzzCmd)
     else:
-        fuzzCmd = "%s -n %d -o %s/fuzzed-%%n.ppt %s" % (fuzzerPath, fuzzIter, fuzzDst, quotestring(testcase))
+        fuzzCmd = "%s -n %d -o %s/fuzzed-%%n%s %s" % (fuzzerPath, fuzzIter, fuzzDst, ext, quotestring(testcase))
     ret = os.system(fuzzCmd)
     if (ret != 0):
         die("fuzzer failed to run")
