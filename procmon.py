@@ -7,6 +7,7 @@ import sys
 
 from decider import *
 from libs_procmon import *
+import ConfigParser
 
 class Process(object):
     proc = None
@@ -66,8 +67,6 @@ class Process(object):
 
 
 class ProcMon(object):
-    pipename="/tmp/monitor_pipe0"
-    savedir="saved"
     debugFlag=True
     save_arg=False #will affect decision to save or not long running testcases
     processTimeout=20
@@ -76,6 +75,7 @@ class ProcMon(object):
     pipe_event=None
     listener=None
     process=None
+    settingsFile = 'settings.ini'
     
     def __init__(self, exeFile, exeArgs):
         self.timeout=threading.Event()
@@ -84,6 +84,25 @@ class ProcMon(object):
         self.exeFile = exeFile
         self.exeArgs = exeArgs
         self.process = Process(self.exeFile, self.exeArgs)
+        self.pipename="/tmp/monitor_pipe0"
+        self.savedir="saved"
+        self.loadSettings()
+        
+    def loadSettings(self):
+        parser = ConfigParser.SafeConfigParser()
+        parser.read(self.settingsFile)
+
+        try:
+            if parser.has_option('procmon', 'debug'):
+                self.debugFlag = parser.getboolean('procmon', 'debug')
+            if parser.has_option('procmon', 'process_timeout'):
+                self.processTimeout = parser.getint('procmon', 'process_timeout')
+            if parser.has_option('procmon', 'pipename'):
+                self.pipename = parser.get('procmon', 'pipename')
+            if parser.has_option('procmon', 'savedir'):
+                self.savedir = parser.get('procmon', 'savedir')
+        except ConfigParser.NoSectionError, err:
+            die("settings: " + err)
      
     #XXX apparently timers are natively implemented in python, you should try that   
     def timer_thread(self):
