@@ -100,3 +100,36 @@ class DumbFuzzer(object):
     
     def getFuzzDst(self):
         return self.fuzzDst
+        
+class Target(object):
+    settingsFile = 'settings.ini'
+    debugProc = None
+    monProc = None
+
+    def __init__(self):
+        self.loadSettings()
+
+    def loadSettings(self):
+        parser = configparser.SafeConfigParser()
+        parser.read(settingsFile)
+        try:
+            self.exePath = parser.get('target', 'exePath')
+            self.exeArgs = parser.get('target', 'exeArgs')
+        except configparser.NoSectionError as err:
+            die("settings: " + err)
+        except configparser.NoOptionError as err:
+            die("settings: " + err)
+
+    def run(self, fuzzedcase):
+        self.debugProc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (self.exePath, self.exeArgs, fuzzedcase), shell="/usr/bin/python")
+        self.monProc = subprocess.Popen("./process_monitor.py %s %s" % (self.exePath, fuzzedcase), shell="/usr/bin/python")
+
+    #blocker
+    #will will monitor when target exits
+    def wait(self):
+        self.debugProc.wait()
+        self.monProc.kill()
+
+    def kill():
+        self.debugProc.kill()
+        self.monProc.kill()

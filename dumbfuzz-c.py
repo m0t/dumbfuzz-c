@@ -15,8 +15,8 @@ import sys
 
 import configparser
 from utils import *
-from dumbfuzzer import DumbFuzzer
-
+from dumbfuzzer import *
+        
 #################################################
 
 def cleanupscript(script):
@@ -42,26 +42,11 @@ def parse_args():
     
     return parser.parse_args()
 
-def loadTargetSettings(settingsFile):
-    parser = configparser.SafeConfigParser()
-    parser.read(settingsFile)
-    try:
-        exePath = parser.get('target', 'exePath')
-        exeArgs = parser.get('target', 'exeArgs')
-    except configparser.NoSectionError as err:
-        die("settings: " + err)
-    except configparser.NoOptionError as err:
-        die("settings: " + err)
     
-    return {'exePath': exePath, 'exeArgs': exeArgs}
-        
 def main():
     
     fuzzer=DumbFuzzer()
-    settingsFile=fuzzer.getSettingsFile()
-    targetOpts = loadTargetSettings(settingsFile)
-    exePath = targetOpts['exePath']
-    exeArgs = targetOpts['exeArgs']
+    target=Target()
     
     fuzzDst = fuzzer.getFuzzDst()
     
@@ -113,30 +98,24 @@ def main():
                 fuzzer.fuzz_testcase(f)
             if opts.noiterate:
                 fuzzer.debug_msg("run target on fuzzed cases folder")
-                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzDst), shell="/usr/bin/python")
-                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzDst), shell="/usr/bin/python")
+                target.run(fuzzDst)
 
-                gdb_proc.wait()
-                mon_proc.kill()
+                target.wait()
             elif opts.runonly:
                 fuzzer.debug_msg("run-only mode, will copy the file and run target directly on %s" % f)
                 fuzzer.empty_fuzzdir(fuzzDst)
                 fuzzedcase=fuzzDst + "/" + os.path.basename(f)
                 shutil.copy(f, fuzzedcase)
-                gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
-                mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+                target.run(fuzzedcase)
 
-                gdb_proc.wait()
-                mon_proc.kill()
+                target.wait()
             else:
                 for file in os.listdir(fuzzDst):            
                     fuzzedcase=fuzzDst + "/" + file
                     fuzzer.debug_msg("run target with file %s" % fuzzedcase)
-                    gdb_proc = subprocess.Popen("./launcher.py --batch --args %s %s %s" % (exePath, exeArgs, fuzzedcase), shell="/usr/bin/python")
-                    mon_proc = subprocess.Popen("./process_monitor.py %s %s" % (exePath, fuzzedcase), shell="/usr/bin/python")
+                    target.run(fuzzedcase)
 
-                    gdb_proc.wait()
-                    mon_proc.kill()
+                    target.wait()
             fuzzer.debug_msg('Terminated fuzzing %s' % f)
             if  opts.nofuzz:
                 fuzzer.debug_msg("nofuzz set, will not destroy testcases")
@@ -149,8 +128,7 @@ def main():
     except KeyboardInterrupt:
         fuzzer.debug_msg("Ctrl-c detected, exiting")
         try:
-            gdb_proc.kill()
-            mon_proc.kill()
+            target.kill()
         except:
             pass
         if cscript:
