@@ -7,7 +7,6 @@ fuzzer script, it will:
 - launch the process_monitor script (in its own process) which check when it's to time to weed the unfruitful processes
 '''
 
-import subprocess
 import optparse
 import shutil
 import os

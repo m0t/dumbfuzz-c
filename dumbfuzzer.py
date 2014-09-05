@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 
 import logging as l
 import configparser
@@ -82,12 +83,12 @@ class DumbFuzzer(object):
         fuzzerPath = self.fuzzerPath
         fuzzDst=self.fuzzDst
         if not os.path.exists(fuzzDst):
-            debug_msg("creating dir %s\n" % (fuzzDst))
+            self.debug_msg("creating dir %s\n" % (fuzzDst))
             os.mkdir(fuzzDst)
         ext=get_ext(testcase)
         if self.debugFlag:
             fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n%s %s" % (self.fuzzerPath, self.fuzzIter, self.fuzzDst, ext, quotestring(testcase))
-            debug_msg(fuzzCmd)
+            self.debug_msg(fuzzCmd)
         else:
             fuzzCmd = "%s -n %d -o %s/fuzzed-%%n%s %s" % (self.fuzzerPath, self.fuzzIter, self.fuzzDst, ext, quotestring(testcase))
         ret = os.system(fuzzCmd)
