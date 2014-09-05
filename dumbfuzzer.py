@@ -85,11 +85,11 @@ class DumbFuzzer(object):
             debug_msg("creating dir %s\n" % (fuzzDst))
             os.mkdir(fuzzDst)
         ext=get_ext(testcase)
-        if debugFlag:
-            fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n%s %s" % (fuzzerPath, fuzzIter, fuzzDst, ext, quotestring(testcase))
+        if self.debugFlag:
+            fuzzCmd = "%s -v -n %d -o %s/fuzzed-%%n%s %s" % (self.fuzzerPath, self.fuzzIter, self.fuzzDst, ext, quotestring(testcase))
             debug_msg(fuzzCmd)
         else:
-            fuzzCmd = "%s -n %d -o %s/fuzzed-%%n%s %s" % (fuzzerPath, fuzzIter, fuzzDst, ext, quotestring(testcase))
+            fuzzCmd = "%s -n %d -o %s/fuzzed-%%n%s %s" % (self.fuzzerPath, self.fuzzIter, self.fuzzDst, ext, quotestring(testcase))
         ret = os.system(fuzzCmd)
         if (ret != 0):
             die("fuzzer failed to run")

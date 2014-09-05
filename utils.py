@@ -1,4 +1,5 @@
 import tempfile
+import os
 
 def tmpfile(pref="dumbfuzz-"):
     """Create and return a temporary file with custom prefix"""
