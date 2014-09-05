@@ -81,7 +81,7 @@ def main():
         lf.close()
     
     if opts.testrun:
-        debug_msg("testrun only, exiting")
+        fuzzer.debug_msg("testrun only, exiting")
         sys.exit(0)
     
     if opts.cleanup:
