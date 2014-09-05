@@ -33,7 +33,7 @@ class DumbFuzzer(object):
                 self.fuzzerPath = parser.get('dumbfuzz', 'fuzzer_path')
             if parser.has_option('dumbfuzz', 'fuzz_iter'):
                 self.fuzzIter = parser.getint('dumbfuzz', 'fuzz_iter')
-        except configparser.NoSectionError, err:
+        except configparser.NoSectionError as err:
             die("settings: " + err)
         #except ConfigParser.NoOptionError, err:
         #    self.debug_msg("settings: " + err)

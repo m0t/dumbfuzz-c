@@ -48,9 +48,9 @@ def loadTargetSettings(settingsFile):
     try:
         exePath = parser.get('target', 'exePath')
         exeArgs = parser.get('target', 'exeArgs')
-    except configparser.NoSectionError, err:
+    except configparser.NoSectionError as err:
         die("settings: " + err)
-    except configparser.NoOptionError, err:
+    except configparser.NoOptionError as err:
         die("settings: " + err)
     
     return {'exePath': exePath, 'exeArgs': exeArgs}
