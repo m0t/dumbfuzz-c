@@ -49,6 +49,7 @@ def main():
     target=Target()
     
     fuzzDst = fuzzer.getFuzzDst()
+    listfile = fuzzer.getCasesListFile()
     
     opts, args = parse_args()
     

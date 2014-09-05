@@ -16,6 +16,7 @@ class DumbFuzzer(object):
         self.fuzzerPath = './radamsa.bin'
         self.fuzzIter = 200
         self.fuzzDst = './fuzzed'
+        self.listfile = 'filelist.txt'
         self.loadSettings()
         
     def loadSettings(self):
@@ -33,6 +34,8 @@ class DumbFuzzer(object):
                 self.fuzzerPath = parser.get('dumbfuzz', 'fuzzer_path')
             if parser.has_option('dumbfuzz', 'fuzz_iter'):
                 self.fuzzIter = parser.getint('dumbfuzz', 'fuzz_iter')
+            if parser.has_option('dumbfuzz', 'cases_list'):
+                self.listfile = parser.get('dumbfuzz', 'cases_list')
         except configparser.NoSectionError as err:
             die("settings: " + err)
         #except ConfigParser.NoOptionError, err:
@@ -100,6 +103,9 @@ class DumbFuzzer(object):
     
     def getFuzzDst(self):
         return self.fuzzDst
+        
+    def getCasesListFile():
+        return self.listfile
         
 class Target(object):
     settingsFile = 'settings.ini'
