@@ -101,7 +101,7 @@ def main():
             
             f = filelist[i]
             if not opts.nofuzz and not opts.runonly:
-                fuzzer.empty_fuzzdir(fuzzDst)
+                fuzzer.empty_fuzzdir()
                 debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzzer.fuzz_testcase(f)
 
@@ -111,7 +111,7 @@ def main():
                 target.wait()
             if opts.runonly:
                 fuzzer.debug_msg("run-only mode, will copy the file and run target directly on %s" % f)
-                fuzzer.empty_fuzzdir(fuzzDst)
+                fuzzer.empty_fuzzdir()
                 fuzzedcase=fuzzDst + "/" + os.path.basename(f)
                 shutil.copy(f, fuzzedcase)
                 target.run(fuzzedcase)
@@ -137,7 +137,7 @@ def main():
             if  opts.nofuzz == True:
                 fuzzer.debug_msg("nofuzz set, will not destroy testcases")
             else:
-                fuzzer.empty_fuzzdir(fuzzDst)
+                fuzzer.empty_fuzzdir()
             if opts.cleanup:
                 cleanupscript(cscript)
     except KeyboardInterrupt:
