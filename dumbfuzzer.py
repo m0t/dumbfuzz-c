@@ -48,12 +48,12 @@ class DumbFuzzer(object):
         if self.logFlag:
             if self.logger == None:
                 self.setup_logger()
-            logger.warn(msg)
+            self.logger.warn(msg)
         if self.debugFlag:
             try:
                 sys.stdout.write('[FUZZER] ' + msg + '\n')
             except BlockingIOError:
-                logger.warn('detected IO error while writing to stdout')
+                self.logger.warn('detected IO error while writing to stdout')
         return
 
     def setup_logger(self):
