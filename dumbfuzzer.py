@@ -96,7 +96,7 @@ class DumbFuzzer(object):
         os.system("rm -rf %s/*" % self.fuzzDst)
     
     def getSettingsFile(self):
-        return settingsFile
+        return self.settingsFile
     
     def getFuzzDst(self):
         return self.fuzzDst
