@@ -104,7 +104,7 @@ class DumbFuzzer(object):
     def getFuzzDst(self):
         return self.fuzzDst
         
-    def getCasesListFile():
+    def getCasesListFile(self):
         return self.listfile
         
 class Target(object):
