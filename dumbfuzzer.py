@@ -111,7 +111,7 @@ class Target(object):
 
     def loadSettings(self):
         parser = configparser.SafeConfigParser()
-        parser.read(settingsFile)
+        parser.read(self.settingsFile)
         try:
             self.exePath = parser.get('target', 'exePath')
             self.exeArgs = parser.get('target', 'exeArgs')
