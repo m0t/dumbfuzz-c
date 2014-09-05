@@ -102,7 +102,7 @@ def main():
             f = filelist[i]
             if not opts.nofuzz and not opts.runonly:
                 fuzzer.empty_fuzzdir()
-                debug_msg('fuzzing testcase #%d : %s' % (i,f))
+                fuzzer.debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzzer.fuzz_testcase(f)
 
             if opts.noiterate:
