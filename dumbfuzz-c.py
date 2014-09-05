@@ -104,11 +104,12 @@ def main():
                 fuzzer.empty_fuzzdir(fuzzDst)
                 debug_msg('fuzzing testcase #%d : %s' % (i,f))
                 fuzzer.fuzz_testcase(f)
-            elif opts.noiterate:
+
+            if opts.noiterate:
                 fuzzer.debug_msg("run target on fuzzed cases folder")
                 target.run(fuzzDst)
                 target.wait()
-            elif opts.runonly:
+            if opts.runonly:
                 fuzzer.debug_msg("run-only mode, will copy the file and run target directly on %s" % f)
                 fuzzer.empty_fuzzdir(fuzzDst)
                 fuzzedcase=fuzzDst + "/" + os.path.basename(f)
@@ -116,7 +117,7 @@ def main():
                 target.run(fuzzedcase)
                 target.wait()
             
-            else:
+            if not opts.noiterate and not opts.runonly:
                 for file in os.listdir(fuzzDst):
                     fuzzedcase=fuzzDst + "/" + file
                     if opts.nofuzz == True:
@@ -133,7 +134,7 @@ def main():
             ####### post operations #######
                  
             fuzzer.debug_msg('Terminated fuzzing %s' % f)
-            if  opts.nofuzz:
+            if  opts.nofuzz == True:
                 fuzzer.debug_msg("nofuzz set, will not destroy testcases")
             else:
                 fuzzer.empty_fuzzdir(fuzzDst)
