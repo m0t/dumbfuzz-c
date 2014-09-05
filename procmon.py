@@ -7,7 +7,7 @@ import sys
 
 from decider import *
 from libs_procmon import *
-import ConfigParser
+import configparser
 
 class Process(object):
     proc = None
@@ -89,7 +89,7 @@ class ProcMon(object):
         self.loadSettings()
         
     def loadSettings(self):
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         parser.read(self.settingsFile)
 
         try:
@@ -101,7 +101,7 @@ class ProcMon(object):
                 self.pipename = parser.get('procmon', 'pipename')
             if parser.has_option('procmon', 'savedir'):
                 self.savedir = parser.get('procmon', 'savedir')
-        except ConfigParser.NoSectionError, err:
+        except configparser.NoSectionError as err:
             die("settings: " + err)
      
     #XXX apparently timers are natively implemented in python, you should try that   

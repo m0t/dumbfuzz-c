@@ -2,7 +2,7 @@ import os
 
 
 import logging as l
-import ConfigParser
+import configparser
 from utils import *
 
 class DumbFuzzer(object):
@@ -19,7 +19,7 @@ class DumbFuzzer(object):
         self.loadSettings()
         
     def loadSettings(self):
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         parser.read(self.settingsFile)
         
         try:
@@ -33,7 +33,7 @@ class DumbFuzzer(object):
                 self.fuzzerPath = parser.get('dumbfuzz', 'fuzzer_path')
             if parser.has_option('dumbfuzz', 'fuzz_iter'):
                 self.fuzzIter = parser.getint('dumbfuzz', 'fuzz_iter')
-        except ConfigParser.NoSectionError, err:
+        except configparser.NoSectionError, err:
             die("settings: " + err)
         #except ConfigParser.NoOptionError, err:
         #    self.debug_msg("settings: " + err)

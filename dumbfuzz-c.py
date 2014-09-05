@@ -13,7 +13,7 @@ import shutil
 import os
 import sys
 
-import ConfigParser
+import configparser
 from utils import *
 from dumbfuzzer import DumbFuzzer
 
@@ -43,14 +43,14 @@ def parse_args():
     return parser.parse_args()
 
 def loadTargetSettings(settingsFile):
-    parser = ConfigParser.SafeConfigParser()
+    parser = configparser.SafeConfigParser()
     parser.read(settingsFile)
     try:
         exePath = parser.get('target', 'exePath')
         exeArgs = parser.get('target', 'exeArgs')
-    except ConfigParser.NoSectionError, err:
+    except configparser.NoSectionError, err:
         die("settings: " + err)
-    except ConfigParser.NoOptionError, err:
+    except configparser.NoOptionError, err:
         die("settings: " + err)
     
     return {'exePath': exePath, 'exeArgs': exeArgs}
