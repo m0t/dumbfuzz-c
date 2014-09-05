@@ -88,10 +88,17 @@ def main():
         cscript=opts.cleanup
     
     try:
+        
+        ####### show starts #########
+        
         start=0
         if opts.skipto:
             start=int(opts.skipto)
+
         for i in range(start,len(filelist)):
+            
+            ##### fuzz and launch ########
+            
             f = filelist[i]
             if not opts.nofuzz and not opts.runonly:
                 fuzzer.empty_fuzzdir(fuzzDst)
@@ -110,13 +117,23 @@ def main():
                 target.run(fuzzedcase)
 
                 target.wait()
+            
             else:
-                for file in os.listdir(fuzzDst):            
+                for file in os.listdir(fuzzDst):
                     fuzzedcase=fuzzDst + "/" + file
+                    if opts.nofuzz:
+                        fuzzer.debug_msg("nofuzz set, will only do first iteration")
+                        target.run(fuzzedcase)
+                        target.wait()
+                        break
+                                
                     fuzzer.debug_msg("run target with file %s" % fuzzedcase)
                     target.run(fuzzedcase)
 
                     target.wait()
+                    
+            ####### post operations #######
+                 
             fuzzer.debug_msg('Terminated fuzzing %s' % f)
             if  opts.nofuzz:
                 fuzzer.debug_msg("nofuzz set, will not destroy testcases")
@@ -124,8 +141,6 @@ def main():
                 fuzzer.empty_fuzzdir(fuzzDst)
             if opts.cleanup:
                 cleanupscript(cscript)
-            if opts.nofuzz:
-                fuzzer.debug_msg("nofuzz set, will only do first iteration")
     except KeyboardInterrupt:
         fuzzer.debug_msg("Ctrl-c detected, exiting")
         try:
