@@ -119,7 +119,7 @@ def main():
             else:
                 for file in os.listdir(fuzzDst):
                     fuzzedcase=fuzzDst + "/" + file
-                    if opts.nofuzz:
+                    if opts.nofuzz == True:
                         fuzzer.debug_msg("nofuzz set, will only do first iteration")
                         target.run(fuzzedcase)
                         target.wait()
