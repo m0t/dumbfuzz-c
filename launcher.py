@@ -77,7 +77,7 @@ class Launcher(object):
                 continue
         try:
             #currently only one type of msg
-            mesg=("PID:%d" % msg).encode('ascii')
+            mesg=("PID:%d\n" % msg).encode('ascii')
             #self.GDB.debug_msg("message: %s" % mesg)
             result = os.write(pipe,mesg)
             os.close(pipe)

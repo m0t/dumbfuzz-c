@@ -56,7 +56,7 @@ class Process(object):
             #keep original name and args, we don't know what the target might execute, we just want to monitor the right pid
             #self.name=self.proc.cmdline()[0]
             #self.args=" ".join(self.proc.cmdline()[1:])
-        except psutil.NoSuchProces:
+        except psutil.NoSuchProcess:
             debug_msg("trying to switch to a non existent pid")
             return False
         return True
@@ -76,6 +76,7 @@ class ProcMon(object):
     listener=None
     process=None
     settingsFile = 'settings.ini'
+    timer = None
     
     def __init__(self, exeFile, exeArgs):
         self.timeout=threading.Event()
@@ -108,6 +109,7 @@ class ProcMon(object):
     def timer_thread(self):
         time.sleep(self.processTimeout)
         self.timeout.set()
+        self.timer.join()
     
     def getSigma2(self, l, mean):
         s2=[]
@@ -169,6 +171,7 @@ class ProcMon(object):
     def cleanup_and_exit(self, retvalue):
         self.destroy_pipe()
         debug_msg("exiting")
+        self.timer.join()
         sys.exit(retvalue)
 
     #immediately kill and exit
