@@ -3,3 +3,5 @@ fuzzed
 *~
 __pycache__
 logs
+settings.ini
+.gitignore

@@ -177,7 +177,7 @@ class GDBWrapper(object):
             out+=self.get_stackcontext()
             crashfile.write(out)
             if echo:
-                self.print(out)
+                self._print(out)
             crashfile.close()
         except:
             raise
@@ -206,11 +206,11 @@ class GDBWrapper(object):
         else:
             return args
         
-    def print(self, msg):
+    def _print(self, msg):
         gdb.write(msg+'\n')
         
     def debug_msg(self, msg):
-        self.print('[GDB DEBUG] '+ msg)
+        self._print('[GDB DEBUG] '+ msg)
         
     def getpid(self):
         out = self.execute_redirect('info proc')
