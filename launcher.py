@@ -58,6 +58,7 @@ class Launcher(object):
         else:
             self.GDB.debug_msg("fuzzed case not found?")
     
+    #XXX rather wrong, should include message types 
     def pipe_send_message(self, msg):
         retries=0
         while True:
