@@ -162,7 +162,7 @@ class ProcMon(object):
         pids=[]
         for proc in psutil.process_iter():
             if any(self.exeFile in s for s in proc.cmdline()): #and not any(sys.argv[0] in s for s in proc.cmdline())
-                if self.exeFile.find(proc.name()) > 0:
+                if self.exeFile.find(proc.name()) >= 0:
                     if any(self.exeArgs in s for s in proc.cmdline()):
                         debug_msg("process pid is "+str(proc.pid))
                         pids.append(proc.pid)
@@ -205,7 +205,8 @@ class ProcMon(object):
     def cleanup_and_exit(self, retvalue):
         self.listener.destroy_pipe()
         debug_msg("exiting")
-        self.timer.join()
+        #self.timer.join()
+        #this should be called by main thread, will exit from whole process
         sys.exit(retvalue)
 
     #immediately kill and exit
@@ -259,7 +260,7 @@ class ProcMon(object):
         p=self.process.proc
         
         timecounter = 0
-        while not self.timeout.is_set():
+        while not self.timer.timeout.is_set():
             if self.listener.pipe_event.is_set():
                 #XXX this will become a huge mess if we create new messages types
                 self.update_pid()
