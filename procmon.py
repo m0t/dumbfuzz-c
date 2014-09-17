@@ -29,6 +29,7 @@ class Listener(threading.Thread):
     pipe_event=threading.Event()
     death_signal=threading.Event()
     errorState=0
+    readInterval=0.5    #seconds , inteval to check pipe
     
     def __init__(self, pipename=None):
         if pipename != None:
@@ -70,7 +71,7 @@ class Listener(threading.Thread):
                 self.target_status['pid']=int(msg[1])
                 self.pipe_event.set()
 
-    def get_pid():
+    def get_pid(self):
         return self.target_status['pid']
         
     def is_target_alive():
@@ -120,7 +121,6 @@ class ProcMon(object):
     debugFlag=True
     save_arg=False #will affect decision to save or not long running testcases
     processTimeout=20
-    readInterval=0.5    #seconds , inteval to check pipe
     listener=None
     process=None
     settingsFile = 'settings.ini'
@@ -161,8 +161,8 @@ class ProcMon(object):
     def find_proc(self):
         pids=[]
         for proc in psutil.process_iter():
-            if any(self.exeName in s for s in proc.cmdline()): #and not any(sys.argv[0] in s for s in proc.cmdline())
-                if self.exeName.find(proc.name()) > 0:
+            if any(self.exeFile in s for s in proc.cmdline()): #and not any(sys.argv[0] in s for s in proc.cmdline())
+                if self.exeFile.find(proc.name()) > 0:
                     if any(self.exeArgs in s for s in proc.cmdline()):
                         debug_msg("process pid is "+str(proc.pid))
                         pids.append(proc.pid)
