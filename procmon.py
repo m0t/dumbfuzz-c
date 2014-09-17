@@ -79,15 +79,14 @@ class Listener(threading.Thread):
 
     def destroy_pipe(self):
         #try to close listener in the cool way
-        self.listener_death_signal.set()
-        self.listener.join()
-        '''
+        self.death_signal.set()
+        
         try:
             os.close(self.pipename)
             os.unlink(self.pipename) #XXX do we have to close the thread?
         except:
             pass
-        '''
+        
 
 class Process(object):
     proc = None
