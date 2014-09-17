@@ -113,7 +113,7 @@ class Process(object):
     def get_pid(self):
         return self.proc.pid
 
-    def is_running():
+    def is_running(self):
         return self.proc.is_running()
 
 class ProcMon(object):
@@ -137,7 +137,7 @@ class ProcMon(object):
         self.savedir="saved"
         self.loadSettings()
         
-        self.timer = Timer(processTimeout)
+        self.timer = Timer(self.processTimeout)
         self.listener = Listener(self.pipename)
         
     def loadSettings(self):
@@ -175,7 +175,7 @@ class ProcMon(object):
     #AND see if we have a pid from the pipe (preferred way)
     #we use a timer to avoid blocking
     def get_proc(self):
-        searchTimer = Timer(searchTimeout)
+        searchTimer = Timer(self.searchTimeout)
         while not searchTimer.timeout.is_set():
             if self.listener.get_pid() != None:
                 self.process.set_pid(self.listener.get_pid())
