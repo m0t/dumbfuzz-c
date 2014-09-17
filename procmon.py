@@ -16,6 +16,7 @@ class Timer(threading.Thread):
     
     def __init__(self, time):
         self.time = time
+        super().__init__()
     
     def run(self):
         #XXX apparently timers are natively implemented in python, you should try that   
