@@ -33,6 +33,7 @@ class Listener(threading.Thread):
     def __init__(self, pipename=None):
         if pipename != None:
             self.pipename = pipename
+        super().__init__()
         
     def run(self):
         try:
@@ -136,6 +137,7 @@ class ProcMon(object):
         self.savedir="saved"
         self.loadSettings()
         
+        self.timer = Timer(processTimeout)
         self.listener = Listener(self.pipename)
         
     def loadSettings(self):
@@ -220,8 +222,6 @@ class ProcMon(object):
 
         debug_msg("pid found: %d ; starting timer thread" % self.process.get_pid())
 
-        self.timer = Timer(processTimeout)
-
         self.timer.start()
         self.wait_for_proc()  
 
@@ -294,5 +294,4 @@ class ProcMon(object):
             debug_msg("Interesting file found, saving testcase")
             self.save_testcase()
         self.kill_proc_and_exit()
-        
-        
+            

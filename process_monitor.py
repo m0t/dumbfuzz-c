@@ -24,6 +24,7 @@ def main():
         procmon=ProcMon(exeFile,exeArgs)
         procmon.start()
     except KeyboardInterrupt:
+        #XXX pretty useless
         debug_msg("ctrl-c detected, killing")
         procmon.cleanup_and_exit(-1)
    

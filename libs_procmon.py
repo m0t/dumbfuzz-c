@@ -19,3 +19,4 @@ def getSigma2(self, l, mean):
     for i in l:
         s2.append(i*i)
     return (sum(s2)/len(s2))-(mean*mean)
+    
