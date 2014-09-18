@@ -14,7 +14,7 @@ def die(msg):
     sys.stderr.write("[ MONITOR ERROR ] " + msg + "\n")
     sys.exit(-1)
 
-def getSigma2(self, l, mean):
+def getSigma2(l, mean):
     s2=[]
     for i in l:
         s2.append(i*i)
