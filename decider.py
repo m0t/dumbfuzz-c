@@ -7,19 +7,21 @@ class Decider(object):
         self.votes=0
         self.save_votes=0
         self.save_arg=save_arg
+        self.weight=0
         
     def update(self, mean, sigma2, timecounter):
         #init votes to 0
         if self.votes < 0:
             self.votes = 0
         
-        weight=0
+        weight=self.weight
         
         #run decision rules, all vars should be already declared at this point
         code=compile(open(self.rules_file).read(),'<string>','exec')
         exec(code)
-
-        self.votes += weight
+        
+        self.weight=weight
+        self.votes += self.weight
         return True
         
     def isQuorumReached(self):
