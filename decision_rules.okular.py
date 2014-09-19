@@ -1,8 +1,9 @@
 #######DECISION RULES
 def get_weight(mean, sigma2, timecounter, cur_votes=0, save_arg=False):
+    weight=0
     #give it a second will you
     if timecounter > 3:
-        weight=0
+        
         if mean == 0:
             weight += 0.3
         elif mean < 10:
