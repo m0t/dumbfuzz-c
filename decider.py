@@ -7,21 +7,23 @@ class Decider(object):
         self.votes=0
         self.save_votes=0
         self.save_arg=save_arg
-        self.weight=0
         
     def update(self, mean, sigma2, timecounter):
         #init votes to 0
         if self.votes < 0:
             self.votes = 0
         
-        weight=self.weight
+        weight=0
         
         #run decision rules, all vars should be already declared at this point
-        code=compile(open(self.rules_file).read(),'<string>','exec')
-        exec(code)
+        from decision_rules import *
+        weight=get_weight(mean, sigma2, cur_votes=self.votes, save_arg=self.save_arg)
         
-        self.weight=weight
-        self.votes += self.weight
+        #this was very cool, only problem is that it doesn't work (cant modify locals)
+        #code=compile(open(self.rules_file).read(),'<string>','exec')
+        #exec(code)
+        
+        self.votes += weight
         return True
         
     def isQuorumReached(self):
