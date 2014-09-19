@@ -1,3 +1,5 @@
+from decision_rules import *
+
 class Decider(object):
     quorum=1
     save_quorum=1
@@ -13,11 +15,8 @@ class Decider(object):
         if self.votes < 0:
             self.votes = 0
         
-        weight=0
-        
         #run decision rules, all vars should be already declared at this point
-        from decision_rules import *
-        weight=get_weight(mean, sigma2, cur_votes=self.votes, save_arg=self.save_arg)
+        weight=get_weight(mean, sigma2, timecounter, cur_votes=self.votes, save_arg=self.save_arg)
         
         #this was very cool, only problem is that it doesn't work (cant modify locals)
         #code=compile(open(self.rules_file).read(),'<string>','exec')

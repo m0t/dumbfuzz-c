@@ -1,6 +1,6 @@
 #######DECISION RULES
-#available args mean, sigma2, timecounter
 def get_weight(mean, sigma2, timecounter, cur_votes=0, save_arg=False):
+    weight=0
     if mean == 0:
         weight += 0.3
     elif mean < 10:
@@ -19,3 +19,5 @@ def get_weight(mean, sigma2, timecounter, cur_votes=0, save_arg=False):
             self.save_votes=1
     elif sigma2 > 200:
         weight -= 0.2
+    
+    return weight
