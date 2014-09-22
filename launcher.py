@@ -53,10 +53,10 @@ class Launcher(object):
         if fuzzedcase:
             if os.path.isdir(fuzzedcase):
                 savefile="fuzzedcases-"+strtime
-                if savefile_exists(savefile):
+                if self.savefile_exists(savefile):
                     i=1
                     while True: 
-                        if not savefile_exists(savefile+"-%d" % i):
+                        if not self.savefile_exists(savefile+"-%d" % i):
                             savefile += "-%d" % i
                             break
                         i += 1
@@ -64,10 +64,10 @@ class Launcher(object):
                 shutil.copytree(fuzzedcase, self.logpath+savefile)
             else:
                 savefile="fuzzedcase-"+strtime
-                if savefile_exists(savefile):
+                if self.savefile_exists(savefile):
                     i=1
                     while True: 
-                        if not savefile_exists(savefile+"-%d" % i):
+                        if not self.savefile_exists(savefile+"-%d" % i):
                             savefile += "-%d" % i
                             break
                         i += 1
