@@ -56,7 +56,7 @@ class Launcher(object):
                 if savefile_exists(savefile):
                     i=1
                     while True: 
-                        if not savefile_exists(savefile+"-%d" % i)
+                        if not savefile_exists(savefile+"-%d" % i):
                             savefile += "-%d" % i
                             break
                         i += 1
@@ -67,7 +67,7 @@ class Launcher(object):
                 if savefile_exists(savefile):
                     i=1
                     while True: 
-                        if not savefile_exists(savefile+"-%d" % i)
+                        if not savefile_exists(savefile+"-%d" % i):
                             savefile += "-%d" % i
                             break
                         i += 1
