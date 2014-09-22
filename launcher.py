@@ -40,7 +40,7 @@ class Launcher(object):
                 sys.exit(-1)
 
     
-    def savefile_exists(savefile):
+    def savefile_exists(self, savefile):
         return os.path.exists(self.logpath+savefile)
 
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
