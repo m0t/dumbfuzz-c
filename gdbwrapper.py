@@ -167,9 +167,17 @@ class GDBWrapper(object):
         write crashdump to /path/prefix-timestamp.txt,
         GDB.execute("x/16xg $rsp-64")
         """
-        strtime=time.strftime('%d-%m-%y_%H%M')
+        strtime=time.strftime('%d-%m-%y_%H%M%S')
+        filename=prefix+"_"+strtime+'.txt'
+        if os.path.exists(path+filename):
+            i=1
+            while True:    
+                if not os.path.exists(path+filename + "-%d" % i):
+                    filename += "-%d" % i
+                    break
+                i += 1
         try:
-            crashfile=open(path+prefix+"_"+strtime+'.txt', 'w')
+            crashfile=open(path+filename, 'w')
             out = self.get_programcontext()
             out+=self.get_regs()
             out+=self.get_callstack()

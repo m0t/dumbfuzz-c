@@ -39,6 +39,10 @@ class Launcher(object):
                 self.GDB.debug_msg("log dir creation failed, dying")
                 sys.exit(-1)
 
+    
+    def savefile_exists(savefile):
+        return os.path.exists(self.logpath+savefile)
+
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
     #check whether the file already exists, you bloody fool
     def save_testcase(self,args):
@@ -49,22 +53,22 @@ class Launcher(object):
         if fuzzedcase:
             if os.path.isdir(fuzzedcase):
                 savefile="fuzzedcases-"+strtime
-                if os.path.exists(savefile):
+                if savefile_exists(savefile):
                     i=1
-                    while True:
-                        savefile += "-%d" % i
-                        if not os.path.exists(savefile):
+                    while True: 
+                        if not savefile_exists(savefile+"-%d" % i)
+                            savefile += "-%d" % i
                             break
                         i += 1
                 self.GDB.debug_msg('passed whole testcases folder, copying everything ')
                 shutil.copytree(fuzzedcase, self.logpath+savefile)
             else:
                 savefile="fuzzedcase-"+strtime
-                if os.path.exists(savefile):
+                if savefile_exists(savefile):
                     i=1
-                    while True:
-                        savefile += "-%d" % i
-                        if not os.path.exists(savefile):
+                    while True: 
+                        if not savefile_exists(savefile+"-%d" % i)
+                            savefile += "-%d" % i
                             break
                         i += 1
                 self.GDB.debug_msg('Saving testcase to ' + savefile)
