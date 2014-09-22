@@ -16,7 +16,7 @@ from gdbsettings import *
 import gdbwrapper
 
 class Launcher(object):
-    logpath='logs/'
+    logpath='logs/' #the slash IS important
     pipename="/tmp/monitor_pipe0"
         
     def __init__(self):
@@ -40,19 +40,33 @@ class Launcher(object):
                 sys.exit(-1)
 
     #save testcase. if we passed the whole testcases folder, detect this and copy the whole bloody folder, 
-    #
+    #check whether the file already exists, you bloody fool
     def save_testcase(self,args):
     
-        strtime=time.strftime('%d-%m-%y_%H%M')
+        strtime=time.strftime('%d-%m-%y_%H%M%S')
 
         fuzzedcase = self.get_inputfile(args)
         if fuzzedcase:
             if os.path.isdir(fuzzedcase):
                 savefile="fuzzedcases-"+strtime
+                if os.path.exists(savefile):
+                    i=1
+                    while True:
+                        savefile += "-%d" % i
+                        if not os.path.exists(savefile):
+                            break
+                        i += 1
                 self.GDB.debug_msg('passed whole testcases folder, copying everything ')
                 shutil.copytree(fuzzedcase, self.logpath+savefile)
             else:
                 savefile="fuzzedcase-"+strtime
+                if os.path.exists(savefile):
+                    i=1
+                    while True:
+                        savefile += "-%d" % i
+                        if not os.path.exists(savefile):
+                            break
+                        i += 1
                 self.GDB.debug_msg('Saving testcase to ' + savefile)
                 shutil.copy(fuzzedcase, self.logpath+savefile)
         else:
