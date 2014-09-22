@@ -109,7 +109,8 @@ def main():
                 target.run(fuzzDst)
                 target.wait()
             if opts.runonly:
-                fuzzer.debug_msg("run-only mode, will copy the file and run target directly on %s" % f)
+                fuzzer.debug_msg("testcase #%d : %f" %(i, f))
+                fuzzer.debug_msg("run-only mode, will copy the file and run target directly on it")
                 fuzzer.empty_fuzzdir()
                 fuzzedcase=fuzzDst + "/" + os.path.basename(f)
                 shutil.copy(f, fuzzedcase)
